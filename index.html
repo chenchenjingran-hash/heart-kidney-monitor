@@ -8,7 +8,7 @@
       content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
     />
     <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260614-bp4" />
   </head>
   <body>
     <header class="app-header">
@@ -87,13 +87,35 @@
                   <input id="weight" name="weight" type="number" min="20" max="300" step="0.1" required />
                   <small id="weightHint">用于判断 3 天体重变化</small>
                 </label>
-                <div class="field">
+                <div class="field blood-pressure-field">
                   <span>血压（mmHg） <b>*</b></span>
-                  <div class="split-input">
-                    <input id="systolic" name="systolic" type="number" min="40" max="260" placeholder="收缩压" required />
-                    <span>/</span>
-                    <input id="diastolic" name="diastolic" type="number" min="30" max="180" placeholder="舒张压" required />
+                  <div class="blood-pressure-grid">
+                    <div class="bp-reading">
+                      <strong>早</strong>
+                      <div class="split-input">
+                        <input id="morningSystolic" name="morningSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <span>/</span>
+                        <input id="morningDiastolic" name="morningDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                      </div>
+                    </div>
+                    <div class="bp-reading">
+                      <strong>中</strong>
+                      <div class="split-input">
+                        <input id="noonSystolic" name="noonSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <span>/</span>
+                        <input id="noonDiastolic" name="noonDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                      </div>
+                    </div>
+                    <div class="bp-reading">
+                      <strong>晚</strong>
+                      <div class="split-input">
+                        <input id="nightSystolic" name="nightSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <span>/</span>
+                        <input id="nightDiastolic" name="nightDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                      </div>
+                    </div>
                   </div>
+                  <small class="bp-help">可分早、中、晚补录，每个时段需同时填写高压和低压。</small>
                 </div>
                 <label class="field">
                   <span>心率（次/分） <b>*</b></span>
@@ -409,6 +431,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js" defer></script>
+    <script src="./app.js?v=20260614-bp4" defer></script>
   </body>
 </html>

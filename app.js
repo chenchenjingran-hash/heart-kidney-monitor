@@ -13,8 +13,12 @@ const WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "�
 const fieldIds = [
   "recordDate",
   "weight",
-  "systolic",
-  "diastolic",
+  "morningSystolic",
+  "morningDiastolic",
+  "noonSystolic",
+  "noonDiastolic",
+  "nightSystolic",
+  "nightDiastolic",
   "heartRate",
   "spo2",
   "intake",
@@ -27,8 +31,12 @@ const fieldIds = [
 
 const numericRecordFields = [
   "weight",
-  "systolic",
-  "diastolic",
+  "morningSystolic",
+  "morningDiastolic",
+  "noonSystolic",
+  "noonDiastolic",
+  "nightSystolic",
+  "nightDiastolic",
   "heartRate",
   "spo2",
   "intake",
@@ -36,6 +44,12 @@ const numericRecordFields = [
   "edema",
   "breathing",
   "glucose",
+];
+
+const bloodPressurePeriods = [
+  { key: "morning", label: "早", systolic: "morningSystolic", diastolic: "morningDiastolic" },
+  { key: "noon", label: "中", systolic: "noonSystolic", diastolic: "noonDiastolic" },
+  { key: "night", label: "晚", systolic: "nightSystolic", diastolic: "nightDiastolic" },
 ];
 
 const labFields = [
@@ -96,20 +110,24 @@ function formatShortDate(value) {
 function sampleState() {
   const today = localDateString();
   const sampleValues = [
-    { offset: -6, weight: 70.1, systolic: 126, diastolic: 76, heartRate: 80, spo2: 97, intake: 1400, urine: 1450, edema: 1, breathing: 1, glucose: 5.8, notes: "" },
-    { offset: -5, weight: 70.3, systolic: 128, diastolic: 78, heartRate: 82, spo2: 97, intake: 1400, urine: 1500, edema: 1, breathing: 1, glucose: 5.6, notes: "" },
-    { offset: -4, weight: 70.6, systolic: 130, diastolic: 80, heartRate: 84, spo2: 96, intake: 1400, urine: 1400, edema: 1, breathing: 2, glucose: 5.9, notes: "" },
-    { offset: -3, weight: 70.6, systolic: 138, diastolic: 86, heartRate: 90, spo2: 95, intake: 1500, urine: 1150, edema: 2, breathing: 3, glucose: 6.0, notes: "下午活动后气短。" },
-    { offset: -2, weight: 71.8, systolic: 132, diastolic: 82, heartRate: 86, spo2: 96, intake: 1400, urine: 1350, edema: 1, breathing: 2, glucose: 5.7, notes: "" },
-    { offset: -1, weight: 72.0, systolic: 134, diastolic: 84, heartRate: 88, spo2: 96, intake: 1400, urine: 1300, edema: 1, breathing: 2, glucose: 5.9, notes: "夜间睡眠一般。" },
-    { offset: 0, weight: 72.7, systolic: 140, diastolic: 88, heartRate: 92, spo2: 95, intake: 1500, urine: 1200, edema: 2, breathing: 3, glucose: 6.2, notes: "今天感觉有些气短，午后休息后稍缓解。" },
+    { offset: -6, weight: 70.1, morningSystolic: 126, morningDiastolic: 76, noonSystolic: 124, noonDiastolic: 74, nightSystolic: 128, nightDiastolic: 76, heartRate: 80, spo2: 97, intake: 1400, urine: 1450, edema: 1, breathing: 1, glucose: 5.8, notes: "" },
+    { offset: -5, weight: 70.3, morningSystolic: 128, morningDiastolic: 78, noonSystolic: 126, noonDiastolic: 76, nightSystolic: 130, nightDiastolic: 78, heartRate: 82, spo2: 97, intake: 1400, urine: 1500, edema: 1, breathing: 1, glucose: 5.6, notes: "" },
+    { offset: -4, weight: 70.6, morningSystolic: 130, morningDiastolic: 80, noonSystolic: 128, noonDiastolic: 78, nightSystolic: 132, nightDiastolic: 80, heartRate: 84, spo2: 96, intake: 1400, urine: 1400, edema: 1, breathing: 2, glucose: 5.9, notes: "" },
+    { offset: -3, weight: 70.6, morningSystolic: 138, morningDiastolic: 86, noonSystolic: 136, noonDiastolic: 84, nightSystolic: 140, nightDiastolic: 86, heartRate: 90, spo2: 95, intake: 1500, urine: 1150, edema: 2, breathing: 3, glucose: 6.0, notes: "下午活动后气短。" },
+    { offset: -2, weight: 71.8, morningSystolic: 132, morningDiastolic: 82, noonSystolic: 130, noonDiastolic: 80, nightSystolic: 134, nightDiastolic: 82, heartRate: 86, spo2: 96, intake: 1400, urine: 1350, edema: 1, breathing: 2, glucose: 5.7, notes: "" },
+    { offset: -1, weight: 72.0, morningSystolic: 134, morningDiastolic: 84, noonSystolic: 132, noonDiastolic: 82, nightSystolic: 136, nightDiastolic: 84, heartRate: 88, spo2: 96, intake: 1400, urine: 1300, edema: 1, breathing: 2, glucose: 5.9, notes: "夜间睡眠一般。" },
+    { offset: 0, weight: 72.7, morningSystolic: 140, morningDiastolic: 88, noonSystolic: 138, noonDiastolic: 86, nightSystolic: "", nightDiastolic: "", heartRate: 92, spo2: 95, intake: 1500, urine: 1200, edema: 2, breathing: 3, glucose: 6.2, notes: "今天感觉有些气短，午后休息后稍缓解。" },
   ];
 
   const records = sampleValues.map((item) => ({
     date: addDays(today, item.offset),
     weight: item.weight,
-    systolic: item.systolic,
-    diastolic: item.diastolic,
+    morningSystolic: item.morningSystolic,
+    morningDiastolic: item.morningDiastolic,
+    noonSystolic: item.noonSystolic,
+    noonDiastolic: item.noonDiastolic,
+    nightSystolic: item.nightSystolic,
+    nightDiastolic: item.nightDiastolic,
     heartRate: item.heartRate,
     spo2: item.spo2,
     intake: item.intake,
@@ -175,18 +193,42 @@ function cryptoId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function normalizeRecord(record) {
+  if (!record || typeof record !== "object") return record;
+  const normalized = { ...record };
+  if (
+    normalized.morningSystolic === undefined &&
+    normalized.morningDiastolic === undefined &&
+    (normalized.systolic !== undefined || normalized.diastolic !== undefined)
+  ) {
+    normalized.morningSystolic = normalized.systolic ?? "";
+    normalized.morningDiastolic = normalized.diastolic ?? "";
+  }
+  bloodPressurePeriods.forEach(({ systolic, diastolic }) => {
+    normalized[systolic] ??= "";
+    normalized[diastolic] ??= "";
+  });
+  return normalized;
+}
+
+function normalizeRecords(records) {
+  return Array.isArray(records) ? records.map(normalizeRecord) : [];
+}
+
 function loadState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      return {
+      const loaded = {
         ...sampleState(),
         ...parsed,
         selectedDate: parsed.selectedDate || localDateString(),
         weekEnd: parsed.weekEnd || localDateString(),
         activeView: "daily",
       };
+      loaded.records = normalizeRecords(parsed.records || loaded.records);
+      return loaded;
     }
   } catch (error) {
     console.warn("无法读取本地数据", error);
@@ -213,7 +255,7 @@ function cloudConfigured() {
 
 function cloudPayload() {
   return {
-    version: 1,
+    version: 2,
     patient: state.patient,
     records: state.records,
     medications: state.medications,
@@ -231,7 +273,7 @@ function applyCloudPayload(payload) {
   state = {
     ...state,
     patient: payload.patient || state.patient,
-    records: Array.isArray(payload.records) ? payload.records : state.records,
+    records: Array.isArray(payload.records) ? normalizeRecords(payload.records) : state.records,
     medications: Array.isArray(payload.medications) ? payload.medications : state.medications,
     labs: Array.isArray(payload.labs) ? payload.labs : state.labs,
     summaryDays: Number(payload.summaryDays) || state.summaryDays || 7,
@@ -525,7 +567,12 @@ function getAlerts(record) {
   if (Number(record.spo2) < 92) alerts.push({ key: "spo2", label: `血氧 ${record.spo2}% 低于 92%`, detail: "请复测并关注呼吸情况。" });
   if (Number(record.urine) < 500) alerts.push({ key: "urine", label: `尿量 ${record.urine} ml 低于 500 ml/天`, detail: "请关注液体出入量并及时联系医生。" });
   if (Number(record.heartRate) > 120) alerts.push({ key: "heartRate", label: `心率 ${record.heartRate} 次/分高于 120`, detail: "请安静休息后复测。" });
-  if (Number(record.systolic) < 90) alerts.push({ key: "systolic", label: `收缩压 ${record.systolic} mmHg 低于 90`, detail: "请关注头晕、乏力等症状。" });
+  bloodPressurePeriods.forEach(({ label, systolic }) => {
+    const value = record[systolic];
+    if (value !== "" && value !== undefined && Number(value) < 90) {
+      alerts.push({ key: systolic, label: `${label}间收缩压 ${value} mmHg 低于 90`, detail: "请关注头晕、乏力等症状。" });
+    }
+  });
   if (Number(record.breathing) >= 3) alerts.push({ key: "breathing", label: `呼吸评分 ${record.breathing} 分`, detail: "已达到预警标准，请关注气促变化。" });
   return alerts;
 }
@@ -612,12 +659,13 @@ function renderTimeline() {
       const selected = record.date === state.selectedDate ? "selected" : "";
       const risk = alerts.length ? "risk" : "";
       const riskKeys = new Set(alerts.map((alert) => alert.key));
+      const bloodPressureRisk = alerts.some((alert) => alert.key.endsWith("Systolic"));
       return `
         <button class="timeline-row ${selected} ${risk}" type="button" data-date="${record.date}">
           <span class="timeline-date">${formatShortDate(record.date)}<br />${WEEKDAYS[parseLocalDate(record.date).getDay()]}</span>
           <span class="timeline-main">
             <span class="timeline-metric">体重<strong class="${riskKeys.has("weight") ? "status-risk" : ""}">${Number(record.weight).toFixed(1)} kg</strong></span>
-            <span class="timeline-metric">血压<strong class="${riskKeys.has("systolic") ? "status-risk" : ""}">${record.systolic}/${record.diastolic}</strong></span>
+            <span class="timeline-metric">血压<strong class="${bloodPressureRisk ? "status-risk" : ""}">${formatBloodPressure(record)}</strong></span>
             <span class="timeline-metric">心率<strong class="${riskKeys.has("heartRate") ? "status-risk" : ""}">${record.heartRate}</strong></span>
             <span class="timeline-secondary">
               尿量 ${record.urine || "—"} ml　|　饮水 ${record.intake || "—"} ml　|　SpO₂ ${record.spo2 || "—"}%　|　水肿 ${record.edema || 0}+　|　呼吸 ${record.breathing || 0}分
@@ -660,6 +708,57 @@ function populateDailyForm() {
     ? `已保存 · ${new Date(record.updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`
     : "尚未保存";
   updateWeightHint();
+}
+
+function bloodPressureReadings(record) {
+  return bloodPressurePeriods
+    .map((period) => ({
+      ...period,
+      systolicValue: record?.[period.systolic],
+      diastolicValue: record?.[period.diastolic],
+    }))
+    .filter((reading) =>
+      reading.systolicValue !== "" &&
+      reading.systolicValue !== undefined &&
+      reading.diastolicValue !== "" &&
+      reading.diastolicValue !== undefined
+    );
+}
+
+function formatBloodPressure(record, includeLabels = true) {
+  const readings = bloodPressureReadings(record);
+  if (!readings.length) return "—";
+  return readings
+    .map((reading) => `${includeLabels ? `${reading.label} ` : ""}${reading.systolicValue}/${reading.diastolicValue}`)
+    .join(" · ");
+}
+
+function validateBloodPressure() {
+  let hasCompleteReading = false;
+  let valid = true;
+
+  bloodPressurePeriods.forEach(({ label, systolic, diastolic }) => {
+    const systolicInput = document.getElementById(systolic);
+    const diastolicInput = document.getElementById(diastolic);
+    systolicInput.setCustomValidity("");
+    diastolicInput.setCustomValidity("");
+    const hasSystolic = systolicInput.value !== "";
+    const hasDiastolic = diastolicInput.value !== "";
+
+    if (hasSystolic && hasDiastolic) hasCompleteReading = true;
+    if (hasSystolic !== hasDiastolic) {
+      const missingInput = hasSystolic ? diastolicInput : systolicInput;
+      missingInput.setCustomValidity(`请同时填写${label}间收缩压和舒张压`);
+      valid = false;
+    }
+  });
+
+  if (!hasCompleteReading && valid) {
+    document.getElementById("morningSystolic").setCustomValidity("请至少填写一个时段的完整血压");
+    valid = false;
+  }
+  if (!valid) document.getElementById("dailyForm").reportValidity();
+  return valid;
 }
 
 function updateWeightHint() {
@@ -768,6 +867,7 @@ function formRecord() {
 function saveDailyRecord(event) {
   event.preventDefault();
   const form = event.currentTarget;
+  if (!validateBloodPressure()) return;
   if (!form.reportValidity()) return;
   const record = formRecord();
   const existingIndex = state.records.findIndex((item) => item.date === record.date);
@@ -973,6 +1073,29 @@ function average(records, key, digits = 0) {
   return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(digits);
 }
 
+function bloodPressureValues(records, valueKey) {
+  return records.flatMap((record) =>
+    bloodPressureReadings(record)
+      .map((reading) => Number(reading[valueKey]))
+      .filter(Number.isFinite)
+  );
+}
+
+function averageValues(values, digits = 0) {
+  if (!values.length) return "—";
+  return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(digits);
+}
+
+function averageBloodPressure(records) {
+  const systolicValues = bloodPressureValues(records, "systolicValue");
+  const diastolicValues = bloodPressureValues(records, "diastolicValue");
+  return `${averageValues(systolicValues)}/${averageValues(diastolicValues)}`;
+}
+
+function bloodPressureReadingCount(records) {
+  return records.reduce((count, record) => count + bloodPressureReadings(record).length, 0);
+}
+
 function minMax(records, key, digits = 0) {
   const values = records.map((record) => Number(record[key])).filter(Number.isFinite);
   if (!values.length) return "—";
@@ -1040,7 +1163,7 @@ function renderSummary() {
       </div>
       <div class="summary-metric">
         <span>平均血压</span>
-        <strong>${average(records, "systolic")}/${average(records, "diastolic")}</strong>
+        <strong>${averageBloodPressure(records)}</strong>
       </div>
       <div class="summary-metric">
         <span>平均血氧</span>
@@ -1072,7 +1195,7 @@ function renderSummary() {
     <h3>趋势概述</h3>
     <p>
       ${records.length
-        ? `本周期记录 ${records.length} 天。体重范围 ${minMax(records, "weight", 1)} kg，平均饮水量 ${average(records, "intake")} ml/天，平均尿量 ${average(records, "urine")} ml/天。平均血氧 ${average(records, "spo2", 1)}%，平均心率 ${average(records, "heartRate")} 次/分。`
+        ? `本周期记录 ${records.length} 天，血压共记录 ${bloodPressureReadingCount(records)} 次，平均血压 ${averageBloodPressure(records)} mmHg。体重范围 ${minMax(records, "weight", 1)} kg，平均饮水量 ${average(records, "intake")} ml/天，平均尿量 ${average(records, "urine")} ml/天。平均血氧 ${average(records, "spo2", 1)}%，平均心率 ${average(records, "heartRate")} 次/分。`
         : "本周期暂无每日监测数据。"}
       ${adherence.rate === null ? "暂无可计算的用药计划。" : `计划服药 ${adherence.scheduled} 次，已确认 ${adherence.taken} 次，完成率 ${adherence.rate}%。`}
     </p>
@@ -1113,7 +1236,8 @@ function summaryPlainText() {
     `${state.patient.name || "家人"} · 近 ${days} 天家庭监测摘要`,
     `记录天数：${records.length}/${days}`,
     `体重范围：${minMax(records, "weight", 1)} kg`,
-    `平均血压：${average(records, "systolic")}/${average(records, "diastolic")} mmHg`,
+    `血压记录：${bloodPressureReadingCount(records)} 次`,
+    `平均血压：${averageBloodPressure(records)} mmHg`,
     `平均心率：${average(records, "heartRate")} 次/分`,
     `平均血氧：${average(records, "spo2", 1)}%`,
     `平均饮水量：${average(records, "intake")} ml/天`,
@@ -1209,17 +1333,21 @@ function bindEvents() {
   document.getElementById("dailyForm").addEventListener("submit", saveDailyRecord);
   document.getElementById("deleteRecordButton").addEventListener("click", deleteDailyRecord);
   document.getElementById("weight").addEventListener("input", updateWeightHint);
-  ["spo2", "urine", "heartRate", "systolic", "breathing"].forEach((id) => {
+  ["spo2", "urine", "heartRate", "breathing", ...bloodPressurePeriods.map((period) => period.systolic)].forEach((id) => {
     document.getElementById(id).addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const isRisk =
         (id === "spo2" && value < 92) ||
         (id === "urine" && value < 500) ||
         (id === "heartRate" && value > 120) ||
-        (id === "systolic" && value < 90) ||
+        (id.endsWith("Systolic") && value < 90) ||
         (id === "breathing" && value >= 3);
       event.target.classList.toggle("risk-field", event.target.value !== "" && isRisk);
+      if (id.endsWith("Systolic")) event.target.setCustomValidity("");
     });
+  });
+  bloodPressurePeriods.forEach(({ systolic, diastolic }) => {
+    document.getElementById(diastolic).addEventListener("input", (event) => event.target.setCustomValidity(""));
   });
 
   document.getElementById("newMedicationButton").addEventListener("click", () => openMedicationForm());
