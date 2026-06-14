@@ -649,16 +649,20 @@ textarea:hover {
   gap: 7px;
 }
 
-.blood-pressure-field {
+.measurement-field,
+.blood-pressure-field,
+.fluid-field {
   grid-column: 1 / -1;
 }
 
+.three-entry-grid,
 .blood-pressure-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
+.measurement-reading,
 .bp-reading {
   padding: 10px;
   background: var(--surface-soft);
@@ -666,6 +670,7 @@ textarea:hover {
   border-radius: 7px;
 }
 
+.measurement-reading > strong,
 .bp-reading > strong {
   display: block;
   margin-bottom: 7px;
@@ -673,7 +678,49 @@ textarea:hover {
   font-size: 12px;
 }
 
-#dailyForm .field .bp-help {
+.measurement-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.measurement-heading > strong {
+  color: var(--blue);
+  font-size: 12px;
+}
+
+.measurement-heading output {
+  margin-left: 5px;
+  color: var(--ink-strong);
+  font-size: 15px;
+}
+
+.six-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.six-entry-grid label {
+  min-width: 0;
+}
+
+.six-entry-grid label > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+
+.six-entry-grid input {
+  padding: 0 7px;
+  text-align: center;
+}
+
+#dailyForm .field .bp-help,
+#dailyForm .field .monitoring-help {
   display: block;
 }
 
@@ -1185,11 +1232,18 @@ dialog::backdrop {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .three-entry-grid,
   .blood-pressure-grid {
     grid-template-columns: 1fr;
   }
 
-  #dailyForm .blood-pressure-field {
+  .six-entry-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  #dailyForm .measurement-field,
+  #dailyForm .blood-pressure-field,
+  #dailyForm .fluid-field {
     grid-column: span 2;
   }
 
@@ -1256,8 +1310,20 @@ dialog::backdrop {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  #dailyForm .blood-pressure-field {
+  #dailyForm .measurement-field,
+  #dailyForm .blood-pressure-field,
+  #dailyForm .fluid-field {
     grid-column: auto;
+  }
+
+  .six-entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .measurement-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .field-wide,

@@ -8,7 +8,7 @@
       content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
     />
     <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css?v=20260614-bp4" />
+    <link rel="stylesheet" href="./styles.css?v=20260615-fluids" />
   </head>
   <body>
     <header class="app-header">
@@ -82,11 +82,24 @@
                   <span>日期 <b>*</b></span>
                   <input id="recordDate" name="date" type="date" required />
                 </label>
-                <label class="field">
+                <div class="field measurement-field weight-field">
                   <span>体重（kg） <b>*</b></span>
-                  <input id="weight" name="weight" type="number" min="20" max="300" step="0.1" required />
-                  <small id="weightHint">用于判断 3 天体重变化</small>
-                </label>
+                  <div class="three-entry-grid">
+                    <div class="measurement-reading">
+                      <strong>早</strong>
+                      <input id="morningWeight" name="morningWeight" type="number" min="20" max="300" step="0.1" placeholder="kg" inputmode="decimal" />
+                    </div>
+                    <div class="measurement-reading">
+                      <strong>中</strong>
+                      <input id="noonWeight" name="noonWeight" type="number" min="20" max="300" step="0.1" placeholder="kg" inputmode="decimal" />
+                    </div>
+                    <div class="measurement-reading">
+                      <strong>晚</strong>
+                      <input id="nightWeight" name="nightWeight" type="number" min="20" max="300" step="0.1" placeholder="kg" inputmode="decimal" />
+                    </div>
+                  </div>
+                  <small class="monitoring-help" id="weightHint">至少填写一次；单日最高与最低相差超过 2 kg 时预警。</small>
+                </div>
                 <div class="field blood-pressure-field">
                   <span>血压（mmHg） <b>*</b></span>
                   <div class="blood-pressure-grid">
@@ -125,14 +138,35 @@
                   <span>血氧 SpO₂（%） <b>*</b></span>
                   <input id="spo2" name="spo2" type="number" min="50" max="100" required />
                 </label>
-                <label class="field">
-                  <span>饮水量（ml）</span>
-                  <input id="intake" name="intake" type="number" min="0" max="10000" step="10" />
-                </label>
-                <label class="field">
-                  <span>尿量（ml/天） <b>*</b></span>
-                  <input id="urine" name="urine" type="number" min="0" max="10000" step="10" required />
-                </label>
+                <div class="field fluid-field">
+                  <div class="measurement-heading">
+                    <span>饮水量（ml）</span>
+                    <strong>当日合计 <output id="intakeTotalDisplay">0 ml</output></strong>
+                  </div>
+                  <div class="six-entry-grid">
+                    <label><span>1</span><input id="intake1" name="intake1" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>2</span><input id="intake2" name="intake2" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>3</span><input id="intake3" name="intake3" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>4</span><input id="intake4" name="intake4" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>5</span><input id="intake5" name="intake5" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>6</span><input id="intake6" name="intake6" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                  </div>
+                </div>
+                <div class="field fluid-field">
+                  <div class="measurement-heading">
+                    <span>尿量（ml/天） <b>*</b></span>
+                    <strong>当日合计 <output id="urineTotalDisplay">0 ml</output></strong>
+                  </div>
+                  <div class="six-entry-grid">
+                    <label><span>1</span><input id="urine1" name="urine1" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>2</span><input id="urine2" name="urine2" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>3</span><input id="urine3" name="urine3" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>4</span><input id="urine4" name="urine4" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>5</span><input id="urine5" name="urine5" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                    <label><span>6</span><input id="urine6" name="urine6" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                  </div>
+                  <small class="monitoring-help">六次记录会自动相加；当日总尿量低于 500 ml 时预警。</small>
+                </div>
                 <label class="field">
                   <span>水肿等级</span>
                   <select id="edema" name="edema">
@@ -431,6 +465,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js?v=20260614-bp4" defer></script>
+    <script src="./app.js?v=20260615-fluids" defer></script>
   </body>
 </html>

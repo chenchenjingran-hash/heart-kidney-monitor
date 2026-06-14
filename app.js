@@ -12,7 +12,9 @@ const WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "�
 
 const fieldIds = [
   "recordDate",
-  "weight",
+  "morningWeight",
+  "noonWeight",
+  "nightWeight",
   "morningSystolic",
   "morningDiastolic",
   "noonSystolic",
@@ -21,8 +23,18 @@ const fieldIds = [
   "nightDiastolic",
   "heartRate",
   "spo2",
-  "intake",
-  "urine",
+  "intake1",
+  "intake2",
+  "intake3",
+  "intake4",
+  "intake5",
+  "intake6",
+  "urine1",
+  "urine2",
+  "urine3",
+  "urine4",
+  "urine5",
+  "urine6",
   "edema",
   "breathing",
   "glucose",
@@ -30,7 +42,9 @@ const fieldIds = [
 ];
 
 const numericRecordFields = [
-  "weight",
+  "morningWeight",
+  "noonWeight",
+  "nightWeight",
   "morningSystolic",
   "morningDiastolic",
   "noonSystolic",
@@ -39,11 +53,27 @@ const numericRecordFields = [
   "nightDiastolic",
   "heartRate",
   "spo2",
-  "intake",
-  "urine",
+  "intake1",
+  "intake2",
+  "intake3",
+  "intake4",
+  "intake5",
+  "intake6",
+  "urine1",
+  "urine2",
+  "urine3",
+  "urine4",
+  "urine5",
+  "urine6",
   "edema",
   "breathing",
   "glucose",
+];
+
+const weightPeriods = [
+  { key: "morning", label: "早", field: "morningWeight" },
+  { key: "noon", label: "中", field: "noonWeight" },
+  { key: "night", label: "晚", field: "nightWeight" },
 ];
 
 const bloodPressurePeriods = [
@@ -51,6 +81,9 @@ const bloodPressurePeriods = [
   { key: "noon", label: "中", systolic: "noonSystolic", diastolic: "noonDiastolic" },
   { key: "night", label: "晚", systolic: "nightSystolic", diastolic: "nightDiastolic" },
 ];
+
+const intakeFields = Array.from({ length: 6 }, (_, index) => `intake${index + 1}`);
+const urineFields = Array.from({ length: 6 }, (_, index) => `urine${index + 1}`);
 
 const labFields = [
   "ntProbnp",
@@ -121,6 +154,9 @@ function sampleState() {
 
   const records = sampleValues.map((item) => ({
     date: addDays(today, item.offset),
+    morningWeight: item.weight,
+    noonWeight: "",
+    nightWeight: "",
     weight: item.weight,
     morningSystolic: item.morningSystolic,
     morningDiastolic: item.morningDiastolic,
@@ -130,7 +166,19 @@ function sampleState() {
     nightDiastolic: item.nightDiastolic,
     heartRate: item.heartRate,
     spo2: item.spo2,
+    intake1: item.intake,
+    intake2: "",
+    intake3: "",
+    intake4: "",
+    intake5: "",
+    intake6: "",
     intake: item.intake,
+    urine1: item.urine,
+    urine2: "",
+    urine3: "",
+    urine4: "",
+    urine5: "",
+    urine6: "",
     urine: item.urine,
     edema: item.edema,
     breathing: item.breathing,
@@ -197,6 +245,28 @@ function normalizeRecord(record) {
   if (!record || typeof record !== "object") return record;
   const normalized = { ...record };
   if (
+    normalized.morningWeight === undefined &&
+    normalized.noonWeight === undefined &&
+    normalized.nightWeight === undefined
+  ) {
+    normalized.morningWeight = normalized.weight ?? "";
+  }
+  weightPeriods.forEach(({ field }) => {
+    normalized[field] ??= "";
+  });
+  if (intakeFields.every((field) => normalized[field] === undefined)) {
+    normalized.intake1 = normalized.intake ?? "";
+  }
+  if (urineFields.every((field) => normalized[field] === undefined)) {
+    normalized.urine1 = normalized.urine ?? "";
+  }
+  [...intakeFields, ...urineFields].forEach((field) => {
+    normalized[field] ??= "";
+  });
+  normalized.weight = dailyWeight(normalized);
+  normalized.intake = sumRecordFields(normalized, intakeFields);
+  normalized.urine = sumRecordFields(normalized, urineFields);
+  if (
     normalized.morningSystolic === undefined &&
     normalized.morningDiastolic === undefined &&
     (normalized.systolic !== undefined || normalized.diastolic !== undefined)
@@ -255,7 +325,7 @@ function cloudConfigured() {
 
 function cloudPayload() {
   return {
-    version: 2,
+    version: 3,
     patient: state.patient,
     records: state.records,
     medications: state.medications,
@@ -541,19 +611,63 @@ function sortRecordsDesc(records = state.records) {
   return [...records].sort((a, b) => b.date.localeCompare(a.date));
 }
 
-function getWeightAlert(record) {
-  if (!record || !Number.isFinite(Number(record.weight))) return null;
+function populatedNumber(value) {
+  return value !== "" && value !== undefined && value !== null && Number.isFinite(Number(value));
+}
+
+function sumRecordFields(record, fields) {
+  const values = fields.map((field) => record?.[field]).filter(populatedNumber).map(Number);
+  return values.length ? values.reduce((sum, value) => sum + value, 0) : "";
+}
+
+function weightReadings(record) {
+  return weightPeriods
+    .map((period) => ({ ...period, value: record?.[period.field] }))
+    .filter((reading) => populatedNumber(reading.value));
+}
+
+function dailyWeight(record) {
+  return weightReadings(record)[0]?.value ?? "";
+}
+
+function formatWeight(record, includeLabels = true) {
+  const readings = weightReadings(record);
+  if (!readings.length) return "—";
+  return readings
+    .map((reading) => `${includeLabels ? `${reading.label} ` : ""}${Number(reading.value).toFixed(1)}`)
+    .join(" · ");
+}
+
+function getDailyWeightRangeAlert(record) {
+  const values = weightReadings(record).map((reading) => Number(reading.value));
+  if (values.length < 2) return null;
+  const range = Math.max(...values) - Math.min(...values);
+  if (range > 2) {
+    return {
+      key: "weightDailyRange",
+      label: `单日体重波动 ${range.toFixed(1)} kg`,
+      detail: `当日最低 ${Math.min(...values).toFixed(1)} kg，最高 ${Math.max(...values).toFixed(1)} kg，波动超过 2 kg。`,
+    };
+  }
+  return null;
+}
+
+function getThreeDayWeightAlert(record) {
+  const currentReading = weightReadings(record)[0];
+  const currentWeight = currentReading?.value;
+  if (!populatedNumber(currentWeight)) return null;
   const previous = state.records
-    .filter((item) => item.date < record.date && dateDiff(record.date, item.date) <= 3 && item.weight !== "")
+    .filter((item) => item.date < record.date && dateDiff(record.date, item.date) <= 3 && populatedNumber(dailyWeight(item)))
     .sort((a, b) => a.date.localeCompare(b.date))[0];
 
   if (!previous) return null;
-  const increase = Number(record.weight) - Number(previous.weight);
+  const previousWeight = Number(dailyWeight(previous));
+  const increase = Number(currentWeight) - previousWeight;
   if (increase >= 2) {
     return {
-      key: "weight",
+      key: currentReading.field,
       label: `3 天内体重增加 ${increase.toFixed(1)} kg`,
-      detail: `${formatShortDate(previous.date)} 为 ${Number(previous.weight).toFixed(1)} kg，当前为 ${Number(record.weight).toFixed(1)} kg。`,
+      detail: `${formatShortDate(previous.date)} 为 ${previousWeight.toFixed(1)} kg，当前为 ${Number(currentWeight).toFixed(1)} kg。`,
     };
   }
   return null;
@@ -562,11 +676,13 @@ function getWeightAlert(record) {
 function getAlerts(record) {
   if (!record) return [];
   const alerts = [];
-  const weightAlert = getWeightAlert(record);
-  if (weightAlert) alerts.push(weightAlert);
-  if (Number(record.spo2) < 92) alerts.push({ key: "spo2", label: `血氧 ${record.spo2}% 低于 92%`, detail: "请复测并关注呼吸情况。" });
-  if (Number(record.urine) < 500) alerts.push({ key: "urine", label: `尿量 ${record.urine} ml 低于 500 ml/天`, detail: "请关注液体出入量并及时联系医生。" });
-  if (Number(record.heartRate) > 120) alerts.push({ key: "heartRate", label: `心率 ${record.heartRate} 次/分高于 120`, detail: "请安静休息后复测。" });
+  const dailyWeightAlert = getDailyWeightRangeAlert(record);
+  const threeDayWeightAlert = getThreeDayWeightAlert(record);
+  if (dailyWeightAlert) alerts.push(dailyWeightAlert);
+  if (threeDayWeightAlert) alerts.push(threeDayWeightAlert);
+  if (populatedNumber(record.spo2) && Number(record.spo2) < 92) alerts.push({ key: "spo2", label: `血氧 ${record.spo2}% 低于 92%`, detail: "请复测并关注呼吸情况。" });
+  if (populatedNumber(record.urine) && Number(record.urine) < 500) alerts.push({ key: "urineTotal", label: `尿量 ${record.urine} ml 低于 500 ml/天`, detail: "请关注液体出入量并及时联系医生。" });
+  if (populatedNumber(record.heartRate) && Number(record.heartRate) > 120) alerts.push({ key: "heartRate", label: `心率 ${record.heartRate} 次/分高于 120`, detail: "请安静休息后复测。" });
   bloodPressurePeriods.forEach(({ label, systolic }) => {
     const value = record[systolic];
     if (value !== "" && value !== undefined && Number(value) < 90) {
@@ -613,7 +729,7 @@ function renderWeekStrip() {
         <button class="day-tile ${selected}" type="button" data-date="${date}">
           <span class="day-date">${formatShortDate(date)} ${WEEKDAYS[parseLocalDate(date).getDay()]}</span>
           <span class="day-status ${status.className}">${status.label}</span>
-          <span class="day-value">${record ? `${Number(record.weight).toFixed(1)} kg` : "点击记录"}</span>
+          <span class="day-value">${record && populatedNumber(dailyWeight(record)) ? `${Number(dailyWeight(record)).toFixed(1)} kg` : "点击记录"}</span>
         </button>
       `;
     })
@@ -660,11 +776,12 @@ function renderTimeline() {
       const risk = alerts.length ? "risk" : "";
       const riskKeys = new Set(alerts.map((alert) => alert.key));
       const bloodPressureRisk = alerts.some((alert) => alert.key.endsWith("Systolic"));
+      const weightRisk = alerts.some((alert) => alert.key === "weightDailyRange" || alert.key.endsWith("Weight"));
       return `
         <button class="timeline-row ${selected} ${risk}" type="button" data-date="${record.date}">
           <span class="timeline-date">${formatShortDate(record.date)}<br />${WEEKDAYS[parseLocalDate(record.date).getDay()]}</span>
           <span class="timeline-main">
-            <span class="timeline-metric">体重<strong class="${riskKeys.has("weight") ? "status-risk" : ""}">${Number(record.weight).toFixed(1)} kg</strong></span>
+            <span class="timeline-metric">体重<strong class="${weightRisk ? "status-risk" : ""}">${formatWeight(record)} kg</strong></span>
             <span class="timeline-metric">血压<strong class="${bloodPressureRisk ? "status-risk" : ""}">${formatBloodPressure(record)}</strong></span>
             <span class="timeline-metric">心率<strong class="${riskKeys.has("heartRate") ? "status-risk" : ""}">${record.heartRate}</strong></span>
             <span class="timeline-secondary">
@@ -700,6 +817,14 @@ function populateDailyForm() {
 
   const alerts = getAlerts(record);
   alerts.forEach((alert) => {
+    if (alert.key === "weightDailyRange") {
+      weightPeriods.forEach(({ field }) => document.getElementById(field).classList.add("risk-field"));
+      return;
+    }
+    if (alert.key === "urineTotal") {
+      urineFields.forEach((field) => document.getElementById(field).classList.add("risk-field"));
+      return;
+    }
     const target = document.getElementById(alert.key);
     if (target) target.classList.add("risk-field");
   });
@@ -707,6 +832,7 @@ function populateDailyForm() {
   document.getElementById("saveStatus").textContent = record
     ? `已保存 · ${new Date(record.updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`
     : "尚未保存";
+  updateFluidTotals();
   updateWeightHint();
 }
 
@@ -761,20 +887,79 @@ function validateBloodPressure() {
   return valid;
 }
 
+function validateWeight() {
+  const inputs = weightPeriods.map(({ field }) => document.getElementById(field));
+  inputs.forEach((input) => input.setCustomValidity(""));
+  if (inputs.some((input) => input.value !== "")) return true;
+  inputs[0].setCustomValidity("请至少填写一次体重");
+  document.getElementById("dailyForm").reportValidity();
+  return false;
+}
+
+function validateUrineEntries() {
+  const inputs = urineFields.map((field) => document.getElementById(field));
+  inputs.forEach((input) => input.setCustomValidity(""));
+  if (inputs.some((input) => input.value !== "")) return true;
+  inputs[0].setCustomValidity("请至少填写一次尿量");
+  document.getElementById("dailyForm").reportValidity();
+  return false;
+}
+
+function sumInputFields(fields) {
+  const values = fields
+    .map((field) => document.getElementById(field).value)
+    .filter((value) => value !== "")
+    .map(Number)
+    .filter(Number.isFinite);
+  return values.length ? values.reduce((sum, value) => sum + value, 0) : 0;
+}
+
+function updateFluidTotals() {
+  const intakeTotal = sumInputFields(intakeFields);
+  const urineTotal = sumInputFields(urineFields);
+  document.getElementById("intakeTotalDisplay").value = `${intakeTotal} ml`;
+  document.getElementById("urineTotalDisplay").value = `${urineTotal} ml`;
+  const hasUrineEntry = urineFields.some((field) => document.getElementById(field).value !== "");
+  const urineRisk = hasUrineEntry && urineTotal < 500;
+  urineFields.forEach((field) => {
+    const input = document.getElementById(field);
+    input.classList.toggle("risk-field", urineRisk && input.value !== "");
+  });
+}
+
 function updateWeightHint() {
   const date = document.getElementById("recordDate").value || state.selectedDate;
-  const weight = Number(document.getElementById("weight").value);
+  const currentEntries = weightPeriods
+    .map(({ field }) => ({ field, value: document.getElementById(field).value }))
+    .filter((entry) => entry.value !== "" && Number.isFinite(Number(entry.value)));
+  const currentReadings = currentEntries.map((entry) => Number(entry.value));
+  const currentWeight = currentReadings[0];
+  const currentWeightField = currentEntries[0]?.field;
   const hint = document.getElementById("weightHint");
   const previous = state.records
-    .filter((item) => item.date < date && dateDiff(date, item.date) <= 3 && item.weight !== "")
+    .filter((item) => item.date < date && dateDiff(date, item.date) <= 3 && populatedNumber(dailyWeight(item)))
     .sort((a, b) => a.date.localeCompare(b.date))[0];
-  if (!previous || !Number.isFinite(weight)) {
-    hint.textContent = "用于判断 3 天体重变化";
-    return;
+  const dailyRange = currentReadings.length >= 2 ? Math.max(...currentReadings) - Math.min(...currentReadings) : null;
+  const threeDayChange = previous && Number.isFinite(currentWeight)
+    ? currentWeight - Number(dailyWeight(previous))
+    : null;
+  const dailyRisk = dailyRange !== null && dailyRange > 2;
+  const threeDayRisk = threeDayChange !== null && threeDayChange >= 2;
+
+  weightPeriods.forEach(({ field }) => {
+    const input = document.getElementById(field);
+    input.classList.toggle("risk-field", dailyRisk || (field === currentWeightField && threeDayRisk));
+    input.setCustomValidity("");
+  });
+
+  const messages = [];
+  if (dailyRange !== null) messages.push(`单日波动 ${dailyRange.toFixed(1)} kg`);
+  if (threeDayChange !== null) {
+    messages.push(`较 ${formatShortDate(previous.date)} ${threeDayChange >= 0 ? "增加" : "减少"} ${Math.abs(threeDayChange).toFixed(1)} kg`);
   }
-  const change = weight - Number(previous.weight);
-  hint.textContent = `较 ${formatShortDate(previous.date)} ${change >= 0 ? "增加" : "减少"} ${Math.abs(change).toFixed(1)} kg`;
-  document.getElementById("weight").classList.toggle("risk-field", change >= 2);
+  hint.textContent = messages.length
+    ? messages.join("；")
+    : "至少填写一次；单日最高与最低相差超过 2 kg 时预警。";
 }
 
 function renderDailyMedicationList() {
@@ -860,6 +1045,9 @@ function formRecord() {
   numericRecordFields.forEach((key) => {
     record[key] = record[key] === "" ? "" : Number(record[key]);
   });
+  record.weight = dailyWeight(record);
+  record.intake = sumRecordFields(record, intakeFields);
+  record.urine = sumRecordFields(record, urineFields);
   record.updatedAt = new Date().toISOString();
   return record;
 }
@@ -867,7 +1055,9 @@ function formRecord() {
 function saveDailyRecord(event) {
   event.preventDefault();
   const form = event.currentTarget;
+  if (!validateWeight()) return;
   if (!validateBloodPressure()) return;
+  if (!validateUrineEntries()) return;
   if (!form.reportValidity()) return;
   const record = formRecord();
   const existingIndex = state.records.findIndex((item) => item.date === record.date);
@@ -1068,9 +1258,23 @@ function periodRecords(days) {
 }
 
 function average(records, key, digits = 0) {
-  const values = records.map((record) => Number(record[key])).filter(Number.isFinite);
+  const values = records.map((record) => record[key]).filter(populatedNumber).map(Number);
   if (!values.length) return "—";
   return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(digits);
+}
+
+function weightValues(records) {
+  return records.flatMap((record) => weightReadings(record).map((reading) => Number(reading.value)));
+}
+
+function weightReadingCount(records) {
+  return weightValues(records).length;
+}
+
+function weightMinMax(records) {
+  const values = weightValues(records);
+  if (!values.length) return "—";
+  return `${Math.min(...values).toFixed(1)}–${Math.max(...values).toFixed(1)}`;
 }
 
 function bloodPressureValues(records, valueKey) {
@@ -1097,7 +1301,7 @@ function bloodPressureReadingCount(records) {
 }
 
 function minMax(records, key, digits = 0) {
-  const values = records.map((record) => Number(record[key])).filter(Number.isFinite);
+  const values = records.map((record) => record[key]).filter(populatedNumber).map(Number);
   if (!values.length) return "—";
   return `${Math.min(...values).toFixed(digits)}–${Math.max(...values).toFixed(digits)}`;
 }
@@ -1129,10 +1333,10 @@ function renderSummary() {
   const allAlerts = records.flatMap((record) => getAlerts(record).map((alert) => ({ ...alert, date: record.date })));
   const adherence = medicationAdherence(records);
   const latestLab = [...state.labs].sort((a, b) => b.date.localeCompare(a.date))[0];
-  const firstWeight = records.find((record) => record.weight !== "");
-  const lastWeight = [...records].reverse().find((record) => record.weight !== "");
+  const firstWeight = records.find((record) => populatedNumber(dailyWeight(record)));
+  const lastWeight = [...records].reverse().find((record) => populatedNumber(dailyWeight(record)));
   const weightChange = firstWeight && lastWeight
-    ? Number(lastWeight.weight) - Number(firstWeight.weight)
+    ? Number(dailyWeight(lastWeight)) - Number(dailyWeight(firstWeight))
     : null;
 
   document.querySelectorAll("[data-summary-days]").forEach((button) => {
@@ -1155,7 +1359,7 @@ function renderSummary() {
     <div class="summary-metrics">
       <div class="summary-metric">
         <span>体重范围</span>
-        <strong>${minMax(records, "weight", 1)} kg</strong>
+        <strong>${weightMinMax(records)} kg</strong>
       </div>
       <div class="summary-metric">
         <span>期内体重变化</span>
@@ -1195,7 +1399,7 @@ function renderSummary() {
     <h3>趋势概述</h3>
     <p>
       ${records.length
-        ? `本周期记录 ${records.length} 天，血压共记录 ${bloodPressureReadingCount(records)} 次，平均血压 ${averageBloodPressure(records)} mmHg。体重范围 ${minMax(records, "weight", 1)} kg，平均饮水量 ${average(records, "intake")} ml/天，平均尿量 ${average(records, "urine")} ml/天。平均血氧 ${average(records, "spo2", 1)}%，平均心率 ${average(records, "heartRate")} 次/分。`
+        ? `本周期记录 ${records.length} 天，体重共记录 ${weightReadingCount(records)} 次，范围 ${weightMinMax(records)} kg；血压共记录 ${bloodPressureReadingCount(records)} 次，平均血压 ${averageBloodPressure(records)} mmHg。平均饮水量 ${average(records, "intake")} ml/天，平均尿量 ${average(records, "urine")} ml/天。平均血氧 ${average(records, "spo2", 1)}%，平均心率 ${average(records, "heartRate")} 次/分。`
         : "本周期暂无每日监测数据。"}
       ${adherence.rate === null ? "暂无可计算的用药计划。" : `计划服药 ${adherence.scheduled} 次，已确认 ${adherence.taken} 次，完成率 ${adherence.rate}%。`}
     </p>
@@ -1235,7 +1439,8 @@ function summaryPlainText() {
   return [
     `${state.patient.name || "家人"} · 近 ${days} 天家庭监测摘要`,
     `记录天数：${records.length}/${days}`,
-    `体重范围：${minMax(records, "weight", 1)} kg`,
+    `体重记录：${weightReadingCount(records)} 次`,
+    `体重范围：${weightMinMax(records)} kg`,
     `血压记录：${bloodPressureReadingCount(records)} 次`,
     `平均血压：${averageBloodPressure(records)} mmHg`,
     `平均心率：${average(records, "heartRate")} 次/分`,
@@ -1310,7 +1515,7 @@ function bindEvents() {
     state.weekEnd = localDateString();
     selectDate(localDateString());
     switchView("daily");
-    document.getElementById("weight").focus();
+    document.getElementById("morningWeight").focus();
   });
   document.getElementById("jumpTodayButton").addEventListener("click", () => {
     state.weekEnd = localDateString();
@@ -1332,13 +1537,24 @@ function bindEvents() {
 
   document.getElementById("dailyForm").addEventListener("submit", saveDailyRecord);
   document.getElementById("deleteRecordButton").addEventListener("click", deleteDailyRecord);
-  document.getElementById("weight").addEventListener("input", updateWeightHint);
-  ["spo2", "urine", "heartRate", "breathing", ...bloodPressurePeriods.map((period) => period.systolic)].forEach((id) => {
+  weightPeriods.forEach(({ field }) => {
+    document.getElementById(field).addEventListener("input", updateWeightHint);
+  });
+  intakeFields.forEach((field) => {
+    document.getElementById(field).addEventListener("input", updateFluidTotals);
+  });
+  urineFields.forEach((field) => {
+    document.getElementById(field).addEventListener("input", (event) => {
+      event.target.setCustomValidity("");
+      updateFluidTotals();
+    });
+  });
+  document.getElementById("recordDate").addEventListener("change", updateWeightHint);
+  ["spo2", "heartRate", "breathing", ...bloodPressurePeriods.map((period) => period.systolic)].forEach((id) => {
     document.getElementById(id).addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const isRisk =
         (id === "spo2" && value < 92) ||
-        (id === "urine" && value < 500) ||
         (id === "heartRate" && value > 120) ||
         (id.endsWith("Systolic") && value < 90) ||
         (id === "breathing" && value >= 3);
