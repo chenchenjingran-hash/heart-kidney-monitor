@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
+      content="?????????????????????????????"
     />
-    <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css?v=20260615-fluids" />
+    <title>???? ? ????</title>
+    <link rel="stylesheet" href="./styles.css?v=20260616-vitals" />
   </head>
   <body>
     <header class="app-header">
       <div class="patient-heading">
-        <div class="eyebrow">家庭健康记录</div>
+        <div class="eyebrow">??????</div>
         <div class="patient-title-row">
-          <h1 id="patientName">家人</h1>
-          <button class="text-button" id="editPatientButton" type="button">编辑资料</button>
+          <h1 id="patientName">??</h1>
+          <button class="text-button" id="editPatientButton" type="button">????</button>
         </div>
-        <p id="patientDetail">心衰合并肾病 · 每日居家监测</p>
+        <p id="patientDetail">?????? ? ??????</p>
       </div>
 
       <div class="header-date" id="headerDate"></div>
@@ -27,28 +27,28 @@
         <button class="sync-button" id="openSyncButton" type="button">
           <span class="sync-dot" id="syncDot" aria-hidden="true"></span>
           <span>
-            <strong id="syncButtonLabel">家庭同步</strong>
-            <small id="syncStatus">本机保存</small>
+            <strong id="syncButtonLabel">????</strong>
+            <small id="syncStatus">????</small>
           </span>
         </button>
-        <button class="primary-button" id="recordTodayButton" type="button">记录今天</button>
-        <button class="secondary-button" id="openSummaryButton" type="button">生成复诊摘要</button>
+        <button class="primary-button" id="recordTodayButton" type="button">????</button>
+        <button class="secondary-button" id="openSummaryButton" type="button">??????</button>
       </div>
     </header>
 
-    <nav class="main-nav" aria-label="主要功能">
-      <button class="nav-button active" data-view="daily" type="button">每日监测</button>
-      <button class="nav-button" data-view="medications" type="button">药物管理</button>
-      <button class="nav-button" data-view="labs" type="button">复查指标</button>
-      <button class="nav-button" data-view="summary" type="button">复诊摘要</button>
+    <nav class="main-nav" aria-label="????">
+      <button class="nav-button active" data-view="daily" type="button">????</button>
+      <button class="nav-button" data-view="medications" type="button">????</button>
+      <button class="nav-button" data-view="labs" type="button">????</button>
+      <button class="nav-button" data-view="summary" type="button">????</button>
     </nav>
 
     <main class="app-main">
       <section id="dailyView" class="app-view">
         <div class="week-toolbar">
-          <button class="week-arrow" id="previousWeekButton" type="button" aria-label="上一周">上一周</button>
+          <button class="week-arrow" id="previousWeekButton" type="button" aria-label="???">???</button>
           <div class="week-strip" id="weekStrip"></div>
-          <button class="week-arrow" id="nextWeekButton" type="button" aria-label="下一周">下一周</button>
+          <button class="week-arrow" id="nextWeekButton" type="button" aria-label="???">???</button>
         </div>
 
         <div class="daily-layout">
@@ -58,10 +58,10 @@
             <section class="timeline-panel" aria-labelledby="recentHeading">
               <div class="section-heading">
                 <div>
-                  <p class="section-kicker">照护时间线</p>
-                  <h2 id="recentHeading">近期记录</h2>
+                  <p class="section-kicker">?????</p>
+                  <h2 id="recentHeading">????</h2>
                 </div>
-                <button class="text-button" id="jumpTodayButton" type="button">回到今天</button>
+                <button class="text-button" id="jumpTodayButton" type="button">????</button>
               </div>
               <div class="timeline-list" id="timelineList"></div>
             </section>
@@ -70,146 +70,190 @@
           <section class="detail-panel" aria-labelledby="recordHeading">
             <div class="section-heading detail-heading">
               <div>
-                <p class="section-kicker">选中日期</p>
-                <h2 id="recordHeading">每日记录</h2>
+                <p class="section-kicker">????</p>
+                <h2 id="recordHeading">????</h2>
               </div>
-              <span class="save-status" id="saveStatus">尚未保存</span>
+              <span class="save-status" id="saveStatus">????</span>
             </div>
 
             <form id="dailyForm">
               <div class="form-grid">
                 <label class="field">
-                  <span>日期 <b>*</b></span>
-                  <input id="recordDate" name="date" type="date" required />
+                  <span>??</span>
+                  <input id="recordDate" name="date" type="date" />
                 </label>
                 <div class="field measurement-field weight-field">
-                  <span>体重（kg） <b>*</b></span>
+                  <span>?????</span>
                   <div class="three-entry-grid">
                     <div class="measurement-reading">
-                      <strong>早</strong>
-                      <input id="morningWeight" name="morningWeight" type="number" min="20" max="300" step="0.1" placeholder="kg" inputmode="decimal" />
+                      <strong>?</strong>
+                      <input id="morningWeight" name="morningWeight" type="number" min="40" max="600" step="any" placeholder="?" inputmode="decimal" />
                     </div>
                     <div class="measurement-reading">
-                      <strong>中</strong>
-                      <input id="noonWeight" name="noonWeight" type="number" min="20" max="300" step="0.1" placeholder="kg" inputmode="decimal" />
+                      <strong>?</strong>
+                      <input id="noonWeight" name="noonWeight" type="number" min="40" max="600" step="any" placeholder="?" inputmode="decimal" />
                     </div>
                     <div class="measurement-reading">
-                      <strong>晚</strong>
-                      <input id="nightWeight" name="nightWeight" type="number" min="20" max="300" step="0.1" placeholder="kg" inputmode="decimal" />
+                      <strong>?</strong>
+                      <input id="nightWeight" name="nightWeight" type="number" min="40" max="600" step="any" placeholder="?" inputmode="decimal" />
                     </div>
                   </div>
-                  <small class="monitoring-help" id="weightHint">至少填写一次；单日最高与最低相差超过 2 kg 时预警。</small>
+                  <small class="monitoring-help" id="weightHint">??????????? 4 ??? 2 kg?????</small>
                 </div>
                 <div class="field blood-pressure-field">
-                  <span>血压（mmHg） <b>*</b></span>
+                  <span>???mmHg?</span>
                   <div class="blood-pressure-grid">
                     <div class="bp-reading">
-                      <strong>早</strong>
+                      <strong>?</strong>
                       <div class="split-input">
-                        <input id="morningSystolic" name="morningSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <input id="morningSystolic" name="morningSystolic" type="number" min="40" max="260" placeholder="???" inputmode="numeric" />
                         <span>/</span>
-                        <input id="morningDiastolic" name="morningDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        <input id="morningDiastolic" name="morningDiastolic" type="number" min="30" max="180" placeholder="???" inputmode="numeric" />
                       </div>
                     </div>
                     <div class="bp-reading">
-                      <strong>中</strong>
+                      <strong>?</strong>
                       <div class="split-input">
-                        <input id="noonSystolic" name="noonSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <input id="noonSystolic" name="noonSystolic" type="number" min="40" max="260" placeholder="???" inputmode="numeric" />
                         <span>/</span>
-                        <input id="noonDiastolic" name="noonDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        <input id="noonDiastolic" name="noonDiastolic" type="number" min="30" max="180" placeholder="???" inputmode="numeric" />
                       </div>
                     </div>
                     <div class="bp-reading">
-                      <strong>晚</strong>
+                      <strong>?</strong>
                       <div class="split-input">
-                        <input id="nightSystolic" name="nightSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <input id="nightSystolic" name="nightSystolic" type="number" min="40" max="260" placeholder="???" inputmode="numeric" />
                         <span>/</span>
-                        <input id="nightDiastolic" name="nightDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        <input id="nightDiastolic" name="nightDiastolic" type="number" min="30" max="180" placeholder="???" inputmode="numeric" />
                       </div>
                     </div>
                   </div>
-                  <small class="bp-help">可分早、中、晚补录，每个时段需同时填写高压和低压。</small>
+                  <small class="bp-help">?????????????????????????</small>
                 </div>
-                <label class="field">
-                  <span>心率（次/分） <b>*</b></span>
-                  <input id="heartRate" name="heartRate" type="number" min="20" max="240" required />
-                </label>
-                <label class="field">
-                  <span>血氧 SpO₂（%） <b>*</b></span>
-                  <input id="spo2" name="spo2" type="number" min="50" max="100" required />
-                </label>
+                <div class="field measurement-field">
+                  <span>????/??</span>
+                  <div class="three-entry-grid">
+                    <div class="measurement-reading">
+                      <strong>?</strong>
+                      <input id="morningHeartRate" name="morningHeartRate" type="number" min="20" max="240" step="any" placeholder="?/?" inputmode="decimal" />
+                    </div>
+                    <div class="measurement-reading">
+                      <strong>?</strong>
+                      <input id="noonHeartRate" name="noonHeartRate" type="number" min="20" max="240" step="any" placeholder="?/?" inputmode="decimal" />
+                    </div>
+                    <div class="measurement-reading">
+                      <strong>?</strong>
+                      <input id="nightHeartRate" name="nightHeartRate" type="number" min="20" max="240" step="any" placeholder="?/?" inputmode="decimal" />
+                    </div>
+                  </div>
+                </div>
+                <div class="field measurement-field">
+                  <span>?? SpO??%?</span>
+                  <div class="three-entry-grid">
+                    <div class="measurement-reading">
+                      <strong>?</strong>
+                      <input id="morningSpo2" name="morningSpo2" type="number" min="0" max="100" step="any" placeholder="%" inputmode="decimal" />
+                    </div>
+                    <div class="measurement-reading">
+                      <strong>?</strong>
+                      <input id="noonSpo2" name="noonSpo2" type="number" min="0" max="100" step="any" placeholder="%" inputmode="decimal" />
+                    </div>
+                    <div class="measurement-reading">
+                      <strong>?</strong>
+                      <input id="nightSpo2" name="nightSpo2" type="number" min="0" max="100" step="any" placeholder="%" inputmode="decimal" />
+                    </div>
+                  </div>
+                </div>
                 <div class="field fluid-field">
                   <div class="measurement-heading">
-                    <span>饮水量（ml）</span>
-                    <strong>当日合计 <output id="intakeTotalDisplay">0 ml</output></strong>
+                    <span>????ml?</span>
+                    <strong>???? <output id="intakeTotalDisplay">0 ml</output></strong>
                   </div>
-                  <div class="six-entry-grid">
-                    <label><span>1</span><input id="intake1" name="intake1" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>2</span><input id="intake2" name="intake2" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>3</span><input id="intake3" name="intake3" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>4</span><input id="intake4" name="intake4" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>5</span><input id="intake5" name="intake5" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>6</span><input id="intake6" name="intake6" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                  <div class="multi-entry-grid">
+                    <label><span>1</span><input id="intake1" name="intake1" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>2</span><input id="intake2" name="intake2" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>3</span><input id="intake3" name="intake3" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>4</span><input id="intake4" name="intake4" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>5</span><input id="intake5" name="intake5" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>6</span><input id="intake6" name="intake6" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>7</span><input id="intake7" name="intake7" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>8</span><input id="intake8" name="intake8" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>9</span><input id="intake9" name="intake9" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>10</span><input id="intake10" name="intake10" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>11</span><input id="intake11" name="intake11" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>12</span><input id="intake12" name="intake12" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>13</span><input id="intake13" name="intake13" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>14</span><input id="intake14" name="intake14" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>15</span><input id="intake15" name="intake15" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
                   </div>
                 </div>
                 <div class="field fluid-field">
                   <div class="measurement-heading">
-                    <span>尿量（ml/天） <b>*</b></span>
-                    <strong>当日合计 <output id="urineTotalDisplay">0 ml</output></strong>
+                    <span>???ml/??</span>
+                    <strong>???? <output id="urineTotalDisplay">0 ml</output></strong>
                   </div>
-                  <div class="six-entry-grid">
-                    <label><span>1</span><input id="urine1" name="urine1" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>2</span><input id="urine2" name="urine2" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>3</span><input id="urine3" name="urine3" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>4</span><input id="urine4" name="urine4" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>5</span><input id="urine5" name="urine5" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
-                    <label><span>6</span><input id="urine6" name="urine6" type="number" min="0" max="5000" step="10" placeholder="ml" inputmode="numeric" /></label>
+                  <div class="multi-entry-grid">
+                    <label><span>1</span><input id="urine1" name="urine1" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>2</span><input id="urine2" name="urine2" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>3</span><input id="urine3" name="urine3" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>4</span><input id="urine4" name="urine4" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>5</span><input id="urine5" name="urine5" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>6</span><input id="urine6" name="urine6" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>7</span><input id="urine7" name="urine7" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>8</span><input id="urine8" name="urine8" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>9</span><input id="urine9" name="urine9" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>10</span><input id="urine10" name="urine10" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>11</span><input id="urine11" name="urine11" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>12</span><input id="urine12" name="urine12" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>13</span><input id="urine13" name="urine13" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>14</span><input id="urine14" name="urine14" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>15</span><input id="urine15" name="urine15" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
                   </div>
-                  <small class="monitoring-help">六次记录会自动相加；当日总尿量低于 500 ml 时预警。</small>
+                  <small class="monitoring-help">15 ???????????????? 500 ml ????</small>
                 </div>
                 <label class="field">
-                  <span>水肿等级</span>
+                  <span>????</span>
                   <select id="edema" name="edema">
-                    <option value="0">0 · 无水肿</option>
-                    <option value="1">1+ · 轻度</option>
-                    <option value="2">2+ · 中度</option>
-                    <option value="3">3+ · 明显</option>
-                    <option value="4">4+ · 严重</option>
+                    <option value="0">0 ? ???</option>
+                    <option value="1">1+ ? ??</option>
+                    <option value="2">2+ ? ??</option>
+                    <option value="3">3+ ? ??</option>
+                    <option value="4">4+ ? ??</option>
                   </select>
                 </label>
                 <label class="field">
-                  <span>呼吸评分（0–4） <b>*</b></span>
-                  <select id="breathing" name="breathing" required>
-                    <option value="0">0 · 正常</option>
-                    <option value="1">1 · 活动后稍喘</option>
-                    <option value="2">2 · 日常活动时气促</option>
-                    <option value="3">3 · 轻微活动或平躺时气促</option>
-                    <option value="4">4 · 静息时明显气促</option>
+                  <span>?????0?4?</span>
+                  <select id="breathing" name="breathing">
+                    <option value="0">0 ? ??</option>
+                    <option value="1">1 ? ?????</option>
+                    <option value="2">2 ? ???????</option>
+                    <option value="3">3 ? ??????????</option>
+                    <option value="4">4 ? ???????</option>
                   </select>
                 </label>
                 <label class="field">
-                  <span>最低血糖（mmol/L）</span>
+                  <span>?????mmol/L?</span>
                   <input id="glucose" name="glucose" type="number" min="0" max="50" step="0.1" />
                 </label>
                 <label class="field field-wide">
-                  <span>备注</span>
-                  <textarea id="notes" name="notes" rows="3" maxlength="300" placeholder="如：气短、乏力、夜间憋醒、食欲变化等"></textarea>
+                  <span>??</span>
+                  <textarea id="notes" name="notes" rows="3" maxlength="300" placeholder="??????????????????"></textarea>
                 </label>
               </div>
 
               <div class="form-actions">
-                <button class="danger-text-button hidden" id="deleteRecordButton" type="button">删除这天记录</button>
-                <button class="primary-button" type="submit">保存每日记录</button>
+                <button class="danger-text-button hidden" id="deleteRecordButton" type="button">??????</button>
+                <button class="primary-button" type="submit">??????</button>
               </div>
             </form>
 
             <div class="daily-medications">
               <div class="subsection-heading">
                 <div>
-                  <p class="section-kicker">按日期记录</p>
-                  <h3>今日用药</h3>
+                  <p class="section-kicker">?????</p>
+                  <h3>????</h3>
                 </div>
-                <button class="text-button" id="manageMedicationsButton" type="button">管理药物</button>
+                <button class="text-button" id="manageMedicationsButton" type="button">????</button>
               </div>
               <div id="dailyMedicationList"></div>
             </div>
@@ -220,44 +264,44 @@
       <section id="medicationsView" class="app-view hidden">
         <div class="page-intro">
           <div>
-            <p class="section-kicker">药物管理</p>
-            <h2>用药计划与剩余数量</h2>
-            <p>填写每个时段的剂量，家属可在每日记录中逐项确认是否已服用。</p>
+            <p class="section-kicker">????</p>
+            <h2>?????????</h2>
+            <p>?????????????????????????????</p>
           </div>
-          <button class="primary-button" id="newMedicationButton" type="button">添加药物</button>
+          <button class="primary-button" id="newMedicationButton" type="button">????</button>
         </div>
 
         <form id="medicationForm" class="editor-form hidden">
           <input id="medicationId" type="hidden" />
           <div class="form-grid medication-grid">
             <label class="field">
-              <span>药名 <b>*</b></span>
-              <input id="medicationName" type="text" maxlength="60" required placeholder="如：呋塞米片" />
+              <span>?? <b>*</b></span>
+              <input id="medicationName" type="text" maxlength="60" required placeholder="??????" />
             </label>
             <label class="field">
-              <span>早晨剂量</span>
-              <input id="morningDose" type="text" maxlength="30" placeholder="如：20 mg" />
+              <span>????</span>
+              <input id="morningDose" type="text" maxlength="30" placeholder="??20 mg" />
             </label>
             <label class="field">
-              <span>中午剂量</span>
-              <input id="noonDose" type="text" maxlength="30" placeholder="无则留空" />
+              <span>????</span>
+              <input id="noonDose" type="text" maxlength="30" placeholder="????" />
             </label>
             <label class="field">
-              <span>晚上剂量</span>
-              <input id="nightDose" type="text" maxlength="30" placeholder="如：20 mg" />
+              <span>????</span>
+              <input id="nightDose" type="text" maxlength="30" placeholder="??20 mg" />
             </label>
             <label class="field">
-              <span>剩余数量</span>
-              <input id="remainingCount" type="number" min="0" max="9999" step="1" placeholder="片 / 粒 / 支" />
+              <span>????</span>
+              <input id="remainingCount" type="number" min="0" max="9999" step="1" placeholder="? / ? / ?" />
             </label>
             <label class="field">
-              <span>数量单位</span>
-              <input id="remainingUnit" type="text" maxlength="10" value="片" />
+              <span>????</span>
+              <input id="remainingUnit" type="text" maxlength="10" value="?" />
             </label>
           </div>
           <div class="form-actions">
-            <button class="secondary-button" id="cancelMedicationButton" type="button">取消</button>
-            <button class="primary-button" type="submit">保存药物</button>
+            <button class="secondary-button" id="cancelMedicationButton" type="button">??</button>
+            <button class="primary-button" type="submit">????</button>
           </div>
         </form>
 
@@ -265,13 +309,13 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>药物名称</th>
-                <th>早</th>
-                <th>中</th>
-                <th>晚</th>
-                <th>今日已服</th>
-                <th>剩余数量</th>
-                <th>操作</th>
+                <th>????</th>
+                <th>?</th>
+                <th>?</th>
+                <th>?</th>
+                <th>????</th>
+                <th>????</th>
+                <th>??</th>
               </tr>
             </thead>
             <tbody id="medicationTableBody"></tbody>
@@ -282,64 +326,64 @@
       <section id="labsView" class="app-view hidden">
         <div class="page-intro">
           <div>
-            <p class="section-kicker">复查指标</p>
-            <h2>医院复查结果</h2>
-            <p>按检查日期保存关键心功能、肾功能与营养指标。</p>
+            <p class="section-kicker">????</p>
+            <h2>??????</h2>
+            <p>??????????????????????</p>
           </div>
-          <button class="primary-button" id="newLabButton" type="button">添加复查</button>
+          <button class="primary-button" id="newLabButton" type="button">????</button>
         </div>
 
         <form id="labForm" class="editor-form hidden">
           <input id="labId" type="hidden" />
           <div class="form-grid lab-grid">
             <label class="field">
-              <span>检查日期 <b>*</b></span>
+              <span>???? <b>*</b></span>
               <input id="labDate" type="date" required />
             </label>
             <label class="field">
-              <span>NT-proBNP（pg/ml）</span>
+              <span>NT-proBNP?pg/ml?</span>
               <input id="ntProbnp" type="number" min="0" step="1" />
             </label>
             <label class="field">
-              <span>LVEF（%）</span>
+              <span>LVEF?%?</span>
               <input id="lvef" type="number" min="0" max="100" step="0.1" />
             </label>
             <label class="field">
-              <span>肌酐（μmol/L）</span>
+              <span>????mol/L?</span>
               <input id="creatinine" type="number" min="0" step="0.1" />
             </label>
             <label class="field">
-              <span>eGFR（ml/min/1.73m²）</span>
+              <span>eGFR?ml/min/1.73m??</span>
               <input id="egfr" type="number" min="0" step="0.1" />
             </label>
             <label class="field">
-              <span>血钾（mmol/L）</span>
+              <span>???mmol/L?</span>
               <input id="potassium" type="number" min="0" step="0.1" />
             </label>
             <label class="field">
-              <span>血钠（mmol/L）</span>
+              <span>???mmol/L?</span>
               <input id="sodium" type="number" min="0" step="0.1" />
             </label>
             <label class="field">
-              <span>白蛋白（g/L）</span>
+              <span>????g/L?</span>
               <input id="albumin" type="number" min="0" step="0.1" />
             </label>
             <label class="field">
-              <span>24小时尿蛋白（g/24h）</span>
+              <span>24??????g/24h?</span>
               <input id="urineProtein24h" type="number" min="0" step="0.01" />
             </label>
             <label class="field">
-              <span>UACR（mg/g）</span>
+              <span>UACR?mg/g?</span>
               <input id="uacr" type="number" min="0" step="0.1" />
             </label>
             <label class="field field-wide">
-              <span>备注</span>
+              <span>??</span>
               <textarea id="labNotes" rows="2" maxlength="300"></textarea>
             </label>
           </div>
           <div class="form-actions">
-            <button class="secondary-button" id="cancelLabButton" type="button">取消</button>
-            <button class="primary-button" type="submit">保存复查</button>
+            <button class="secondary-button" id="cancelLabButton" type="button">??</button>
+            <button class="primary-button" type="submit">????</button>
           </div>
         </form>
 
@@ -347,17 +391,17 @@
           <table class="data-table compact-table">
             <thead>
               <tr>
-                <th>日期</th>
+                <th>??</th>
                 <th>NT-proBNP</th>
                 <th>LVEF</th>
-                <th>肌酐</th>
+                <th>??</th>
                 <th>eGFR</th>
-                <th>血钾</th>
-                <th>血钠</th>
-                <th>白蛋白</th>
-                <th>24h尿蛋白</th>
+                <th>??</th>
+                <th>??</th>
+                <th>???</th>
+                <th>24h???</th>
                 <th>UACR</th>
-                <th>操作</th>
+                <th>??</th>
               </tr>
             </thead>
             <tbody id="labTableBody"></tbody>
@@ -368,17 +412,17 @@
       <section id="summaryView" class="app-view hidden">
         <div class="page-intro summary-intro">
           <div>
-            <p class="section-kicker">复诊摘要</p>
-            <h2>把家庭监测重点带给医生</h2>
-            <p>摘要会根据已保存的记录自动更新，不替代医生判断。</p>
+            <p class="section-kicker">????</p>
+            <h2>???????????</h2>
+            <p>????????????????????????</p>
           </div>
           <div class="summary-controls">
-            <div class="segmented-control" role="group" aria-label="摘要天数">
-              <button class="active" data-summary-days="7" type="button">近 7 天</button>
-              <button data-summary-days="30" type="button">近 30 天</button>
+            <div class="segmented-control" role="group" aria-label="????">
+              <button class="active" data-summary-days="7" type="button">? 7 ?</button>
+              <button data-summary-days="30" type="button">? 30 ?</button>
             </div>
-            <button class="secondary-button" id="copySummaryButton" type="button">复制摘要</button>
-            <button class="primary-button" id="printSummaryButton" type="button">打印摘要</button>
+            <button class="secondary-button" id="copySummaryButton" type="button">????</button>
+            <button class="primary-button" id="printSummaryButton" type="button">????</button>
           </div>
         </div>
         <article class="summary-sheet" id="summaryContent"></article>
@@ -386,30 +430,30 @@
     </main>
 
     <footer class="app-footer">
-      <p>数据会先保存在当前浏览器；登录家庭账号后可加密传输至云端并跨设备同步。出现明显胸闷、静息气促、意识改变等紧急情况，请立即就医。</p>
-      <button class="text-button" id="resetDemoButton" type="button">恢复演示数据</button>
+      <p>???????????????????????????????????????????????????????????????</p>
+      <button class="text-button" id="resetDemoButton" type="button">??????</button>
     </footer>
 
     <dialog id="patientDialog">
       <form id="patientForm" method="dialog" class="dialog-form">
         <div class="dialog-heading">
-          <h2>患者资料</h2>
-          <button class="dialog-close" id="closePatientDialog" type="button" aria-label="关闭">关闭</button>
+          <h2>????</h2>
+          <button class="dialog-close" id="closePatientDialog" type="button" aria-label="??">??</button>
         </div>
         <label class="field">
-          <span>称呼或姓名</span>
+          <span>?????</span>
           <input id="patientNameInput" maxlength="30" />
         </label>
         <label class="field">
-          <span>年龄</span>
+          <span>??</span>
           <input id="patientAgeInput" type="number" min="0" max="130" />
         </label>
         <label class="field">
-          <span>备注信息</span>
-          <input id="patientConditionInput" maxlength="80" placeholder="如：心衰（NYHA II级）· 慢性肾病3期" />
+          <span>????</span>
+          <input id="patientConditionInput" maxlength="80" placeholder="?????NYHA II??? ????3?" />
         </label>
         <div class="form-actions">
-          <button class="primary-button" type="submit">保存资料</button>
+          <button class="primary-button" type="submit">????</button>
         </div>
       </form>
     </dialog>
@@ -418,46 +462,46 @@
       <div class="dialog-form">
         <div class="dialog-heading">
           <div>
-            <p class="section-kicker">家庭账号</p>
-            <h2>跨设备同步</h2>
+            <p class="section-kicker">????</p>
+            <h2>?????</h2>
           </div>
-          <button class="dialog-close" id="closeSyncDialog" type="button" aria-label="关闭">关闭</button>
+          <button class="dialog-close" id="closeSyncDialog" type="button" aria-label="??">??</button>
         </div>
 
         <div id="signedOutPanel">
-          <p class="dialog-description">手机和电脑使用同一个邮箱与密码登录，即可看到同一份记录。首次登录会把当前设备中的记录上传到家庭账号。</p>
+          <p class="dialog-description">??????????????????????????????????????????????????</p>
           <form id="syncAuthForm" class="sync-auth-form">
             <label class="field">
-              <span>家庭邮箱</span>
+              <span>????</span>
               <input id="syncEmail" type="email" autocomplete="email" required placeholder="name@example.com" />
             </label>
             <label class="field">
-              <span>密码</span>
-              <input id="syncPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="至少 6 位" />
+              <span>??</span>
+              <input id="syncPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="?? 6 ?" />
             </label>
             <p class="form-message hidden" id="syncFormMessage" role="status"></p>
             <div class="sync-auth-actions">
-              <button class="primary-button" id="signInButton" type="submit">登录并同步</button>
-              <button class="secondary-button" id="signUpButton" type="button">首次注册</button>
+              <button class="primary-button" id="signInButton" type="submit">?????</button>
+              <button class="secondary-button" id="signUpButton" type="button">????</button>
             </div>
           </form>
         </div>
 
         <div class="hidden" id="signedInPanel">
           <div class="account-card">
-            <span class="account-avatar" aria-hidden="true">家</span>
+            <span class="account-avatar" aria-hidden="true">?</span>
             <div>
-              <strong id="syncAccountEmail">家庭账号</strong>
-              <p id="syncAccountStatus">已连接云端</p>
+              <strong id="syncAccountEmail">????</strong>
+              <p id="syncAccountStatus">?????</p>
             </div>
           </div>
           <div class="sync-note">
-            <strong>同步说明</strong>
-            <p>每次保存会先写入本机，再自动上传。重新打开网页或回到页面时会检查其他设备的新记录。</p>
+            <strong>????</strong>
+            <p>?????????????????????????????????????????</p>
           </div>
           <div class="sync-auth-actions">
-            <button class="primary-button" id="syncNowButton" type="button">立即同步</button>
-            <button class="secondary-button" id="signOutButton" type="button">退出账号</button>
+            <button class="primary-button" id="syncNowButton" type="button">????</button>
+            <button class="secondary-button" id="signOutButton" type="button">????</button>
           </div>
         </div>
       </div>
@@ -465,6 +509,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js?v=20260615-fluids" defer></script>
+    <script src="./app.js?v=20260616-vitals" defer></script>
   </body>
 </html>

@@ -8,7 +8,11 @@ const CLOUD_TABLE = "family_state";
 const SUPABASE_URL = "https://hnwrytbwqufiktesjbth.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_LwdQ_fHZJCyxSWS4kQiCvg_mV8osjjW";
 const DAY_MS = 24 * 60 * 60 * 1000;
-const WEEKDAYS = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const CLOUD_PAYLOAD_VERSION = 4;
+const JIN_PER_KG = 2;
+const WEIGHT_DAILY_RANGE_RISK_JIN = 4;
+const WEIGHT_THREE_DAY_GAIN_RISK_JIN = 4;
+const WEEKDAYS = ["??", "??", "??", "??", "??", "??", "??"];
 
 const fieldIds = [
   "recordDate",
@@ -21,20 +25,42 @@ const fieldIds = [
   "noonDiastolic",
   "nightSystolic",
   "nightDiastolic",
-  "heartRate",
-  "spo2",
+  "morningHeartRate",
+  "noonHeartRate",
+  "nightHeartRate",
+  "morningSpo2",
+  "noonSpo2",
+  "nightSpo2",
   "intake1",
   "intake2",
   "intake3",
   "intake4",
   "intake5",
   "intake6",
+  "intake7",
+  "intake8",
+  "intake9",
+  "intake10",
+  "intake11",
+  "intake12",
+  "intake13",
+  "intake14",
+  "intake15",
   "urine1",
   "urine2",
   "urine3",
   "urine4",
   "urine5",
   "urine6",
+  "urine7",
+  "urine8",
+  "urine9",
+  "urine10",
+  "urine11",
+  "urine12",
+  "urine13",
+  "urine14",
+  "urine15",
   "edema",
   "breathing",
   "glucose",
@@ -51,39 +77,73 @@ const numericRecordFields = [
   "noonDiastolic",
   "nightSystolic",
   "nightDiastolic",
-  "heartRate",
-  "spo2",
+  "morningHeartRate",
+  "noonHeartRate",
+  "nightHeartRate",
+  "morningSpo2",
+  "noonSpo2",
+  "nightSpo2",
   "intake1",
   "intake2",
   "intake3",
   "intake4",
   "intake5",
   "intake6",
+  "intake7",
+  "intake8",
+  "intake9",
+  "intake10",
+  "intake11",
+  "intake12",
+  "intake13",
+  "intake14",
+  "intake15",
   "urine1",
   "urine2",
   "urine3",
   "urine4",
   "urine5",
   "urine6",
+  "urine7",
+  "urine8",
+  "urine9",
+  "urine10",
+  "urine11",
+  "urine12",
+  "urine13",
+  "urine14",
+  "urine15",
   "edema",
   "breathing",
   "glucose",
 ];
 
 const weightPeriods = [
-  { key: "morning", label: "早", field: "morningWeight" },
-  { key: "noon", label: "中", field: "noonWeight" },
-  { key: "night", label: "晚", field: "nightWeight" },
+  { key: "morning", label: "?", field: "morningWeight" },
+  { key: "noon", label: "?", field: "noonWeight" },
+  { key: "night", label: "?", field: "nightWeight" },
 ];
 
 const bloodPressurePeriods = [
-  { key: "morning", label: "早", systolic: "morningSystolic", diastolic: "morningDiastolic" },
-  { key: "noon", label: "中", systolic: "noonSystolic", diastolic: "noonDiastolic" },
-  { key: "night", label: "晚", systolic: "nightSystolic", diastolic: "nightDiastolic" },
+  { key: "morning", label: "?", systolic: "morningSystolic", diastolic: "morningDiastolic" },
+  { key: "noon", label: "?", systolic: "noonSystolic", diastolic: "noonDiastolic" },
+  { key: "night", label: "?", systolic: "nightSystolic", diastolic: "nightDiastolic" },
 ];
 
-const intakeFields = Array.from({ length: 6 }, (_, index) => `intake${index + 1}`);
-const urineFields = Array.from({ length: 6 }, (_, index) => `urine${index + 1}`);
+const heartRatePeriods = [
+  { key: "morning", label: "?", field: "morningHeartRate" },
+  { key: "noon", label: "?", field: "noonHeartRate" },
+  { key: "night", label: "?", field: "nightHeartRate" },
+];
+
+const spo2Periods = [
+  { key: "morning", label: "?", field: "morningSpo2" },
+  { key: "noon", label: "?", field: "noonSpo2" },
+  { key: "night", label: "?", field: "nightSpo2" },
+];
+
+const intakeFields = Array.from({ length: 15 }, (_, index) => `intake${index + 1}`);
+const urineFields = Array.from({ length: 15 }, (_, index) => `urine${index + 1}`);
 
 const labFields = [
   "ntProbnp",
@@ -129,10 +189,10 @@ function dateDiff(a, b) {
 }
 
 function formatDate(value, includeYear = false) {
-  if (!value) return "—";
+  if (!value) return "?";
   const date = parseLocalDate(value);
-  const monthDay = `${date.getMonth() + 1}月${date.getDate()}日`;
-  return `${includeYear ? `${date.getFullYear()}年` : ""}${monthDay}（${WEEKDAYS[date.getDay()]}）`;
+  const monthDay = `${date.getMonth() + 1}?${date.getDate()}?`;
+  return `${includeYear ? `${date.getFullYear()}?` : ""}${monthDay}?${WEEKDAYS[date.getDay()]}?`;
 }
 
 function formatShortDate(value) {
@@ -146,39 +206,36 @@ function sampleState() {
     { offset: -6, weight: 70.1, morningSystolic: 126, morningDiastolic: 76, noonSystolic: 124, noonDiastolic: 74, nightSystolic: 128, nightDiastolic: 76, heartRate: 80, spo2: 97, intake: 1400, urine: 1450, edema: 1, breathing: 1, glucose: 5.8, notes: "" },
     { offset: -5, weight: 70.3, morningSystolic: 128, morningDiastolic: 78, noonSystolic: 126, noonDiastolic: 76, nightSystolic: 130, nightDiastolic: 78, heartRate: 82, spo2: 97, intake: 1400, urine: 1500, edema: 1, breathing: 1, glucose: 5.6, notes: "" },
     { offset: -4, weight: 70.6, morningSystolic: 130, morningDiastolic: 80, noonSystolic: 128, noonDiastolic: 78, nightSystolic: 132, nightDiastolic: 80, heartRate: 84, spo2: 96, intake: 1400, urine: 1400, edema: 1, breathing: 2, glucose: 5.9, notes: "" },
-    { offset: -3, weight: 70.6, morningSystolic: 138, morningDiastolic: 86, noonSystolic: 136, noonDiastolic: 84, nightSystolic: 140, nightDiastolic: 86, heartRate: 90, spo2: 95, intake: 1500, urine: 1150, edema: 2, breathing: 3, glucose: 6.0, notes: "下午活动后气短。" },
+    { offset: -3, weight: 70.6, morningSystolic: 138, morningDiastolic: 86, noonSystolic: 136, noonDiastolic: 84, nightSystolic: 140, nightDiastolic: 86, heartRate: 90, spo2: 95, intake: 1500, urine: 1150, edema: 2, breathing: 3, glucose: 6.0, notes: "????????" },
     { offset: -2, weight: 71.8, morningSystolic: 132, morningDiastolic: 82, noonSystolic: 130, noonDiastolic: 80, nightSystolic: 134, nightDiastolic: 82, heartRate: 86, spo2: 96, intake: 1400, urine: 1350, edema: 1, breathing: 2, glucose: 5.7, notes: "" },
-    { offset: -1, weight: 72.0, morningSystolic: 134, morningDiastolic: 84, noonSystolic: 132, noonDiastolic: 82, nightSystolic: 136, nightDiastolic: 84, heartRate: 88, spo2: 96, intake: 1400, urine: 1300, edema: 1, breathing: 2, glucose: 5.9, notes: "夜间睡眠一般。" },
-    { offset: 0, weight: 72.7, morningSystolic: 140, morningDiastolic: 88, noonSystolic: 138, noonDiastolic: 86, nightSystolic: "", nightDiastolic: "", heartRate: 92, spo2: 95, intake: 1500, urine: 1200, edema: 2, breathing: 3, glucose: 6.2, notes: "今天感觉有些气短，午后休息后稍缓解。" },
+    { offset: -1, weight: 72.0, morningSystolic: 134, morningDiastolic: 84, noonSystolic: 132, noonDiastolic: 82, nightSystolic: 136, nightDiastolic: 84, heartRate: 88, spo2: 96, intake: 1400, urine: 1300, edema: 1, breathing: 2, glucose: 5.9, notes: "???????" },
+    { offset: 0, weight: 72.7, morningSystolic: 140, morningDiastolic: 88, noonSystolic: 138, noonDiastolic: 86, nightSystolic: "", nightDiastolic: "", heartRate: 92, spo2: 95, intake: 1500, urine: 1200, edema: 2, breathing: 3, glucose: 6.2, notes: "??????????????????" },
   ];
 
   const records = sampleValues.map((item) => ({
     date: addDays(today, item.offset),
-    morningWeight: item.weight,
+    weightUnit: "jin",
+    morningWeight: kgToJin(item.weight),
     noonWeight: "",
     nightWeight: "",
-    weight: item.weight,
+    weight: kgToJin(item.weight),
     morningSystolic: item.morningSystolic,
     morningDiastolic: item.morningDiastolic,
     noonSystolic: item.noonSystolic,
     noonDiastolic: item.noonDiastolic,
     nightSystolic: item.nightSystolic,
     nightDiastolic: item.nightDiastolic,
+    morningHeartRate: item.heartRate,
+    noonHeartRate: "",
+    nightHeartRate: "",
     heartRate: item.heartRate,
+    morningSpo2: item.spo2,
+    noonSpo2: "",
+    nightSpo2: "",
     spo2: item.spo2,
-    intake1: item.intake,
-    intake2: "",
-    intake3: "",
-    intake4: "",
-    intake5: "",
-    intake6: "",
+    ...singleValueEntries(intakeFields, item.intake),
     intake: item.intake,
-    urine1: item.urine,
-    urine2: "",
-    urine3: "",
-    urine4: "",
-    urine5: "",
-    urine6: "",
+    ...singleValueEntries(urineFields, item.urine),
     urine: item.urine,
     edema: item.edema,
     breathing: item.breathing,
@@ -188,10 +245,10 @@ function sampleState() {
   }));
 
   const medications = [
-    { id: cryptoId(), name: "呋塞米片", morningDose: "20 mg", noonDose: "", nightDose: "20 mg", remainingCount: 12, remainingUnit: "片", taken: {} },
-    { id: cryptoId(), name: "螺内酯片", morningDose: "20 mg", noonDose: "", nightDose: "", remainingCount: 18, remainingUnit: "片", taken: {} },
-    { id: cryptoId(), name: "美托洛尔缓释片", morningDose: "47.5 mg", noonDose: "", nightDose: "", remainingCount: 9, remainingUnit: "片", taken: {} },
-    { id: cryptoId(), name: "沙库巴曲缬沙坦片", morningDose: "50 mg", noonDose: "", nightDose: "50 mg", remainingCount: 14, remainingUnit: "片", taken: {} },
+    { id: cryptoId(), name: "????", morningDose: "20 mg", noonDose: "", nightDose: "20 mg", remainingCount: 12, remainingUnit: "?", taken: {} },
+    { id: cryptoId(), name: "????", morningDose: "20 mg", noonDose: "", nightDose: "", remainingCount: 18, remainingUnit: "?", taken: {} },
+    { id: cryptoId(), name: "???????", morningDose: "47.5 mg", noonDose: "", nightDose: "", remainingCount: 9, remainingUnit: "?", taken: {} },
+    { id: cryptoId(), name: "????????", morningDose: "50 mg", noonDose: "", nightDose: "50 mg", remainingCount: 14, remainingUnit: "?", taken: {} },
   ];
 
   medications.forEach((medication) => {
@@ -207,9 +264,9 @@ function sampleState() {
 
   return {
     patient: {
-      name: "家人",
+      name: "??",
       age: "",
-      condition: "心衰合并肾病 · 每日居家监测",
+      condition: "?????? ? ??????",
     },
     records,
     medications,
@@ -226,7 +283,7 @@ function sampleState() {
         albumin: 35,
         urineProtein24h: 1.2,
         uacr: 420,
-        notes: "门诊复查",
+        notes: "????",
       },
     ],
     selectedDate: today,
@@ -239,6 +296,14 @@ function sampleState() {
 function cryptoId() {
   if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function kgToJin(value) {
+  return populatedNumber(value) ? Number((Number(value) * JIN_PER_KG).toFixed(1)) : value;
+}
+
+function singleValueEntries(fields, firstValue = "") {
+  return Object.fromEntries(fields.map((field, index) => [field, index === 0 ? firstValue : ""]));
 }
 
 function normalizeRecord(record) {
@@ -254,6 +319,13 @@ function normalizeRecord(record) {
   weightPeriods.forEach(({ field }) => {
     normalized[field] ??= "";
   });
+  if (normalized.weightUnit !== "jin") {
+    weightPeriods.forEach(({ field }) => {
+      normalized[field] = kgToJin(normalized[field]);
+    });
+    normalized.weight = kgToJin(normalized.weight);
+    normalized.weightUnit = "jin";
+  }
   if (intakeFields.every((field) => normalized[field] === undefined)) {
     normalized.intake1 = normalized.intake ?? "";
   }
@@ -263,9 +335,31 @@ function normalizeRecord(record) {
   [...intakeFields, ...urineFields].forEach((field) => {
     normalized[field] ??= "";
   });
+  if (
+    normalized.morningHeartRate === undefined &&
+    normalized.noonHeartRate === undefined &&
+    normalized.nightHeartRate === undefined
+  ) {
+    normalized.morningHeartRate = normalized.heartRate ?? "";
+  }
+  heartRatePeriods.forEach(({ field }) => {
+    normalized[field] ??= "";
+  });
+  if (
+    normalized.morningSpo2 === undefined &&
+    normalized.noonSpo2 === undefined &&
+    normalized.nightSpo2 === undefined
+  ) {
+    normalized.morningSpo2 = normalized.spo2 ?? "";
+  }
+  spo2Periods.forEach(({ field }) => {
+    normalized[field] ??= "";
+  });
   normalized.weight = dailyWeight(normalized);
   normalized.intake = sumRecordFields(normalized, intakeFields);
   normalized.urine = sumRecordFields(normalized, urineFields);
+  normalized.heartRate = dailyVital(normalized, heartRatePeriods);
+  normalized.spo2 = dailyVital(normalized, spo2Periods);
   if (
     normalized.morningSystolic === undefined &&
     normalized.morningDiastolic === undefined &&
@@ -301,7 +395,7 @@ function loadState() {
       return loaded;
     }
   } catch (error) {
-    console.warn("无法读取本地数据", error);
+    console.warn("????????", error);
   }
   const initial = sampleState();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
@@ -325,7 +419,7 @@ function cloudConfigured() {
 
 function cloudPayload() {
   return {
-    version: 3,
+    version: CLOUD_PAYLOAD_VERSION,
     patient: state.patient,
     records: state.records,
     medications: state.medications,
@@ -376,17 +470,17 @@ function renderSyncAccount() {
   signedOutPanel.classList.toggle("hidden", Boolean(cloudSession));
   signedInPanel.classList.toggle("hidden", !cloudSession);
   if (cloudSession) {
-    const email = cloudSession.user?.email || "家庭账号";
+    const email = cloudSession.user?.email || "????";
     document.getElementById("syncAccountEmail").textContent = email;
-    label.textContent = "家庭账号";
+    label.textContent = "????";
   } else {
-    label.textContent = cloudConfigured() ? "登录同步" : "家庭同步";
+    label.textContent = cloudConfigured() ? "????" : "????";
   }
 }
 
 function queueCloudPush() {
   if (!cloudClient || !cloudSession || cloudSyncing) {
-    if (cloudConfigured() && !cloudSession) setSyncUi("local", "等待登录");
+    if (cloudConfigured() && !cloudSession) setSyncUi("local", "????");
     return;
   }
   window.clearTimeout(cloudPushTimer);
@@ -400,12 +494,12 @@ async function pushCloudState(options = {}) {
   if (!options.force && serialized === lastSyncedPayload) {
     cloudDirty = false;
     localStorage.removeItem(CLOUD_DIRTY_KEY);
-    setSyncUi("synced", "已同步");
+    setSyncUi("synced", "???");
     return true;
   }
 
   cloudSyncing = true;
-  setSyncUi("syncing", "正在上传");
+  setSyncUi("syncing", "????");
   const updatedAt = new Date().toISOString();
   try {
     const { data, error } = await cloudClient
@@ -422,11 +516,11 @@ async function pushCloudState(options = {}) {
     cloudDirty = false;
     localStorage.removeItem(CLOUD_DIRTY_KEY);
     localStorage.setItem(CLOUD_REMOTE_UPDATED_KEY, data?.updated_at || updatedAt);
-    setSyncUi("synced", `已同步 ${new Date(data?.updated_at || updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`);
+    setSyncUi("synced", `??? ${new Date(data?.updated_at || updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`);
     return true;
   } catch (error) {
-    console.warn("云端上传失败", error);
-    setSyncUi("error", navigator.onLine ? "同步失败，点此重试" : "离线，稍后重试");
+    console.warn("??????", error);
+    setSyncUi("error", navigator.onLine ? "?????????" : "???????");
     return false;
   } finally {
     cloudSyncing = false;
@@ -442,7 +536,7 @@ async function pullCloudState(options = {}) {
   if (!cloudClient || !cloudSession || cloudSyncing) return false;
   if (options.silent && hasFocusedEditor()) return false;
   cloudSyncing = true;
-  setSyncUi("syncing", "正在检查");
+  setSyncUi("syncing", "????");
   try {
     const { data, error } = await cloudClient
       .from(CLOUD_TABLE)
@@ -454,7 +548,7 @@ async function pullCloudState(options = {}) {
     if (!data) {
       cloudSyncing = false;
       const uploaded = await pushCloudState({ force: true });
-      if (uploaded && !options.silent) showToast("当前设备记录已导入家庭账号");
+      if (uploaded && !options.silent) showToast("?????????????");
       return uploaded;
     }
 
@@ -468,17 +562,17 @@ async function pullCloudState(options = {}) {
     const serialized = cloudPayloadString(data.data);
     if (serialized !== cloudPayloadString()) {
       applyCloudPayload(data.data);
-      if (!options.silent) showToast("已载入家庭账号中的最新记录");
+      if (!options.silent) showToast("?????????????");
     }
     lastSyncedPayload = serialized;
     cloudDirty = false;
     localStorage.removeItem(CLOUD_DIRTY_KEY);
     localStorage.setItem(CLOUD_REMOTE_UPDATED_KEY, remoteUpdatedAt);
-    setSyncUi("synced", `已同步 ${new Date(remoteUpdatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`);
+    setSyncUi("synced", `??? ${new Date(remoteUpdatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`);
     return true;
   } catch (error) {
-    console.warn("云端读取失败", error);
-    setSyncUi("error", navigator.onLine ? "同步失败，点此重试" : "离线，稍后重试");
+    console.warn("??????", error);
+    setSyncUi("error", navigator.onLine ? "?????????" : "???????");
     return false;
   } finally {
     cloudSyncing = false;
@@ -490,7 +584,7 @@ async function handleCloudSession(session) {
   renderSyncAccount();
   if (!session) {
     lastSyncedPayload = "";
-    setSyncUi("local", cloudConfigured() ? "等待登录" : "本机保存");
+    setSyncUi("local", cloudConfigured() ? "????" : "????");
     return;
   }
   await pullCloudState();
@@ -499,10 +593,10 @@ async function handleCloudSession(session) {
 async function initCloudSync() {
   renderSyncAccount();
   if (!cloudConfigured()) {
-    setSyncUi("local", "本机保存");
+    setSyncUi("local", "????");
     return;
   }
-  setSyncUi("syncing", "正在连接");
+  setSyncUi("syncing", "????");
   try {
     const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
     cloudClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -519,31 +613,31 @@ async function initCloudSync() {
       window.setTimeout(() => handleCloudSession(session), 0);
     });
   } catch (error) {
-    console.warn("无法初始化云同步", error);
-    setSyncUi("error", "云服务连接失败");
+    console.warn("????????", error);
+    setSyncUi("error", "???????");
   }
 }
 
 async function signInToCloud(event) {
   event.preventDefault();
   if (!cloudClient) {
-    setSyncFormMessage("云同步尚未配置完成。");
+    setSyncFormMessage("??????????");
     return;
   }
   const email = document.getElementById("syncEmail").value.trim();
   const password = document.getElementById("syncPassword").value;
   setSyncFormMessage("");
-  setSyncUi("syncing", "正在登录");
+  setSyncUi("syncing", "????");
   const button = document.getElementById("signInButton");
   button.disabled = true;
   try {
     const { error } = await cloudClient.auth.signInWithPassword({ email, password });
     if (error) throw error;
     document.getElementById("syncPassword").value = "";
-    showToast("家庭账号已登录");
+    showToast("???????");
   } catch (error) {
-    setSyncFormMessage(error?.message === "Invalid login credentials" ? "邮箱或密码不正确。" : `登录失败：${error?.message || "请稍后重试"}`);
-    setSyncUi("error", "登录失败");
+    setSyncFormMessage(error?.message === "Invalid login credentials" ? "?????????" : `?????${error?.message || "?????"}`);
+    setSyncUi("error", "????");
   } finally {
     button.disabled = false;
   }
@@ -551,7 +645,7 @@ async function signInToCloud(event) {
 
 async function signUpForCloud() {
   if (!cloudClient) {
-    setSyncFormMessage("云同步尚未配置完成。");
+    setSyncFormMessage("??????????");
     return;
   }
   const form = document.getElementById("syncAuthForm");
@@ -561,7 +655,7 @@ async function signUpForCloud() {
   const button = document.getElementById("signUpButton");
   button.disabled = true;
   setSyncFormMessage("");
-  setSyncUi("syncing", "正在注册");
+  setSyncUi("syncing", "????");
   try {
     const { data, error } = await cloudClient.auth.signUp({
       email,
@@ -571,14 +665,14 @@ async function signUpForCloud() {
     if (error) throw error;
     document.getElementById("syncPassword").value = "";
     if (data.session) {
-      showToast("家庭账号已创建并开始同步");
+      showToast("????????????");
     } else {
-      setSyncFormMessage("注册成功。请打开邮箱确认后，再回到这里登录。", true);
-      setSyncUi("local", "等待邮箱确认");
+      setSyncFormMessage("??????????????????????", true);
+      setSyncUi("local", "??????");
     }
   } catch (error) {
-    setSyncFormMessage(`注册失败：${error?.message || "请稍后重试"}`);
-    setSyncUi("error", "注册失败");
+    setSyncFormMessage(`?????${error?.message || "?????"}`);
+    setSyncUi("error", "????");
   } finally {
     button.disabled = false;
   }
@@ -588,11 +682,11 @@ async function signOutFromCloud() {
   if (!cloudClient) return;
   const { error } = await cloudClient.auth.signOut();
   if (error) {
-    showToast("退出失败，请稍后重试");
+    showToast("??????????");
     return;
   }
   document.getElementById("syncDialog").close();
-  showToast("已退出家庭账号，本机记录仍保留");
+  showToast("???????????????");
 }
 
 function showToast(message) {
@@ -615,6 +709,14 @@ function populatedNumber(value) {
   return value !== "" && value !== undefined && value !== null && Number.isFinite(Number(value));
 }
 
+function formatNumber(value, maxDigits = 1) {
+  if (!populatedNumber(value)) return "?";
+  return Number(value).toLocaleString("zh-CN", {
+    maximumFractionDigits: maxDigits,
+    minimumFractionDigits: 0,
+  });
+}
+
 function sumRecordFields(record, fields) {
   const values = fields.map((field) => record?.[field]).filter(populatedNumber).map(Number);
   return values.length ? values.reduce((sum, value) => sum + value, 0) : "";
@@ -626,27 +728,45 @@ function weightReadings(record) {
     .filter((reading) => populatedNumber(reading.value));
 }
 
+function vitalReadings(record, periods) {
+  return periods
+    .map((period) => ({ ...period, value: record?.[period.field] }))
+    .filter((reading) => populatedNumber(reading.value));
+}
+
+function dailyVital(record, periods) {
+  return vitalReadings(record, periods)[0]?.value ?? "";
+}
+
+function formatVital(record, periods, suffix = "") {
+  const readings = vitalReadings(record, periods);
+  if (!readings.length) return "?";
+  return readings
+    .map((reading) => `${reading.label} ${formatNumber(reading.value)}${suffix}`)
+    .join(" ? ");
+}
+
 function dailyWeight(record) {
   return weightReadings(record)[0]?.value ?? "";
 }
 
 function formatWeight(record, includeLabels = true) {
   const readings = weightReadings(record);
-  if (!readings.length) return "—";
+  if (!readings.length) return "?";
   return readings
-    .map((reading) => `${includeLabels ? `${reading.label} ` : ""}${Number(reading.value).toFixed(1)}`)
-    .join(" · ");
+    .map((reading) => `${includeLabels ? `${reading.label} ` : ""}${formatNumber(reading.value, 1)}`)
+    .join(" ? ");
 }
 
 function getDailyWeightRangeAlert(record) {
   const values = weightReadings(record).map((reading) => Number(reading.value));
   if (values.length < 2) return null;
   const range = Math.max(...values) - Math.min(...values);
-  if (range > 2) {
+  if (range > WEIGHT_DAILY_RANGE_RISK_JIN) {
     return {
       key: "weightDailyRange",
-      label: `单日体重波动 ${range.toFixed(1)} kg`,
-      detail: `当日最低 ${Math.min(...values).toFixed(1)} kg，最高 ${Math.max(...values).toFixed(1)} kg，波动超过 2 kg。`,
+      label: `?????? ${formatNumber(range, 1)} ?`,
+      detail: `???? ${formatNumber(Math.min(...values), 1)} ???? ${formatNumber(Math.max(...values), 1)} ?????? 4 ??? 2 kg??`,
     };
   }
   return null;
@@ -663,11 +783,11 @@ function getThreeDayWeightAlert(record) {
   if (!previous) return null;
   const previousWeight = Number(dailyWeight(previous));
   const increase = Number(currentWeight) - previousWeight;
-  if (increase >= 2) {
+  if (increase >= WEIGHT_THREE_DAY_GAIN_RISK_JIN) {
     return {
       key: currentReading.field,
-      label: `3 天内体重增加 ${increase.toFixed(1)} kg`,
-      detail: `${formatShortDate(previous.date)} 为 ${previousWeight.toFixed(1)} kg，当前为 ${Number(currentWeight).toFixed(1)} kg。`,
+      label: `3 ?????? ${formatNumber(increase, 1)} ?`,
+      detail: `${formatShortDate(previous.date)} ? ${formatNumber(previousWeight, 1)} ????? ${formatNumber(currentWeight, 1)} ??`,
     };
   }
   return null;
@@ -680,31 +800,35 @@ function getAlerts(record) {
   const threeDayWeightAlert = getThreeDayWeightAlert(record);
   if (dailyWeightAlert) alerts.push(dailyWeightAlert);
   if (threeDayWeightAlert) alerts.push(threeDayWeightAlert);
-  if (populatedNumber(record.spo2) && Number(record.spo2) < 92) alerts.push({ key: "spo2", label: `血氧 ${record.spo2}% 低于 92%`, detail: "请复测并关注呼吸情况。" });
-  if (populatedNumber(record.urine) && Number(record.urine) < 500) alerts.push({ key: "urineTotal", label: `尿量 ${record.urine} ml 低于 500 ml/天`, detail: "请关注液体出入量并及时联系医生。" });
-  if (populatedNumber(record.heartRate) && Number(record.heartRate) > 120) alerts.push({ key: "heartRate", label: `心率 ${record.heartRate} 次/分高于 120`, detail: "请安静休息后复测。" });
+  vitalReadings(record, spo2Periods).forEach(({ label, field, value }) => {
+    if (Number(value) < 92) alerts.push({ key: field, label: `${label}??? ${formatNumber(value, 1)}% ?? 92%`, detail: "???????????" });
+  });
+  if (populatedNumber(record.urine) && Number(record.urine) < 500) alerts.push({ key: "urineTotal", label: `?? ${formatNumber(record.urine, 2)} ml ?? 500 ml/?`, detail: "????????????????" });
+  vitalReadings(record, heartRatePeriods).forEach(({ label, field, value }) => {
+    if (Number(value) > 120) alerts.push({ key: field, label: `${label}??? ${formatNumber(value, 1)} ?/??? 120`, detail: "?????????" });
+  });
   bloodPressurePeriods.forEach(({ label, systolic }) => {
     const value = record[systolic];
     if (value !== "" && value !== undefined && Number(value) < 90) {
-      alerts.push({ key: systolic, label: `${label}间收缩压 ${value} mmHg 低于 90`, detail: "请关注头晕、乏力等症状。" });
+      alerts.push({ key: systolic, label: `${label}???? ${value} mmHg ?? 90`, detail: "????????????" });
     }
   });
-  if (Number(record.breathing) >= 3) alerts.push({ key: "breathing", label: `呼吸评分 ${record.breathing} 分`, detail: "已达到预警标准，请关注气促变化。" });
+  if (Number(record.breathing) >= 3) alerts.push({ key: "breathing", label: `???? ${record.breathing} ?`, detail: "????????????????" });
   return alerts;
 }
 
 function recordStatus(record) {
-  if (!record) return { label: "待记录", className: "status-empty" };
+  if (!record) return { label: "???", className: "status-empty" };
   const alerts = getAlerts(record);
-  if (alerts.length) return { label: "风险", className: "status-risk" };
-  if (Number(record.edema) >= 2 || Number(record.breathing) === 2) return { label: "注意", className: "status-warning" };
-  return { label: "完成", className: "status-normal" };
+  if (alerts.length) return { label: "??", className: "status-risk" };
+  if (Number(record.edema) >= 2 || Number(record.breathing) === 2) return { label: "??", className: "status-warning" };
+  return { label: "??", className: "status-normal" };
 }
 
 function renderPatientHeader() {
-  document.getElementById("patientName").textContent = state.patient.name || "家人";
-  const age = state.patient.age ? `${state.patient.age} 岁 · ` : "";
-  document.getElementById("patientDetail").textContent = `${age}${state.patient.condition || "心衰合并肾病 · 每日居家监测"}`;
+  document.getElementById("patientName").textContent = state.patient.name || "??";
+  const age = state.patient.age ? `${state.patient.age} ? ? ` : "";
+  document.getElementById("patientDetail").textContent = `${age}${state.patient.condition || "?????? ? ??????"}`;
   document.getElementById("headerDate").textContent = formatDate(localDateString(), true);
 }
 
@@ -729,7 +853,7 @@ function renderWeekStrip() {
         <button class="day-tile ${selected}" type="button" data-date="${date}">
           <span class="day-date">${formatShortDate(date)} ${WEEKDAYS[parseLocalDate(date).getDay()]}</span>
           <span class="day-status ${status.className}">${status.label}</span>
-          <span class="day-value">${record && populatedNumber(dailyWeight(record)) ? `${Number(dailyWeight(record)).toFixed(1)} kg` : "点击记录"}</span>
+          <span class="day-value">${record && populatedNumber(dailyWeight(record)) ? `${formatNumber(dailyWeight(record), 1)} ?` : "????"}</span>
         </button>
       `;
     })
@@ -756,7 +880,7 @@ function renderAlertBanner() {
       <strong>${alerts[0].label}</strong>
       <p>${alerts.map((alert) => alert.detail).join(" ")}</p>
     </div>
-    <span class="alert-count">${alerts.length} 项预警</span>
+    <span class="alert-count">${alerts.length} ???</span>
   `;
 }
 
@@ -764,7 +888,7 @@ function renderTimeline() {
   const list = document.getElementById("timelineList");
   const records = sortRecordsDesc().slice(0, 30);
   if (!records.length) {
-    list.innerHTML = `<div class="empty-state">还没有每日记录。<br />点击“记录今天”开始。</div>`;
+    list.innerHTML = `<div class="empty-state">????????<br />???????????</div>`;
     return;
   }
 
@@ -774,18 +898,19 @@ function renderTimeline() {
       const status = recordStatus(record);
       const selected = record.date === state.selectedDate ? "selected" : "";
       const risk = alerts.length ? "risk" : "";
-      const riskKeys = new Set(alerts.map((alert) => alert.key));
       const bloodPressureRisk = alerts.some((alert) => alert.key.endsWith("Systolic"));
       const weightRisk = alerts.some((alert) => alert.key === "weightDailyRange" || alert.key.endsWith("Weight"));
+      const heartRateRisk = alerts.some((alert) => alert.key.endsWith("HeartRate"));
+      const spo2Risk = alerts.some((alert) => alert.key.endsWith("Spo2"));
       return `
         <button class="timeline-row ${selected} ${risk}" type="button" data-date="${record.date}">
           <span class="timeline-date">${formatShortDate(record.date)}<br />${WEEKDAYS[parseLocalDate(record.date).getDay()]}</span>
           <span class="timeline-main">
-            <span class="timeline-metric">体重<strong class="${weightRisk ? "status-risk" : ""}">${formatWeight(record)} kg</strong></span>
-            <span class="timeline-metric">血压<strong class="${bloodPressureRisk ? "status-risk" : ""}">${formatBloodPressure(record)}</strong></span>
-            <span class="timeline-metric">心率<strong class="${riskKeys.has("heartRate") ? "status-risk" : ""}">${record.heartRate}</strong></span>
+            <span class="timeline-metric">??<strong class="${weightRisk ? "status-risk" : ""}">${formatWeight(record)} ?</strong></span>
+            <span class="timeline-metric">??<strong class="${bloodPressureRisk ? "status-risk" : ""}">${formatBloodPressure(record)}</strong></span>
+            <span class="timeline-metric">??<strong class="${heartRateRisk ? "status-risk" : ""}">${formatVital(record, heartRatePeriods)}</strong></span>
             <span class="timeline-secondary">
-              尿量 ${record.urine || "—"} ml　|　饮水 ${record.intake || "—"} ml　|　SpO₂ ${record.spo2 || "—"}%　|　水肿 ${record.edema || 0}+　|　呼吸 ${record.breathing || 0}分
+              ?? ${formatNumber(record.urine)} ml?|??? ${formatNumber(record.intake)} ml?|?SpO? <span class="${spo2Risk ? "status-risk" : ""}">${formatVital(record, spo2Periods, "%")}</span>?|??? ${record.edema || 0}+?|??? ${record.breathing || 0}?
             </span>
           </span>
           <span class="timeline-status ${status.className}">${status.label}</span>
@@ -801,7 +926,7 @@ function renderTimeline() {
 
 function populateDailyForm() {
   const record = getRecord(state.selectedDate);
-  document.getElementById("recordHeading").textContent = `${formatDate(state.selectedDate)}记录`;
+  document.getElementById("recordHeading").textContent = `${formatDate(state.selectedDate)}??`;
   document.getElementById("recordDate").value = state.selectedDate;
 
   fieldIds.slice(1).forEach((id) => {
@@ -830,8 +955,8 @@ function populateDailyForm() {
   });
   document.getElementById("deleteRecordButton").classList.toggle("hidden", !record);
   document.getElementById("saveStatus").textContent = record
-    ? `已保存 · ${new Date(record.updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`
-    : "尚未保存";
+    ? `??? ? ${new Date(record.updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`
+    : "????";
   updateFluidTotals();
   updateWeightHint();
 }
@@ -853,10 +978,10 @@ function bloodPressureReadings(record) {
 
 function formatBloodPressure(record, includeLabels = true) {
   const readings = bloodPressureReadings(record);
-  if (!readings.length) return "—";
+  if (!readings.length) return "?";
   return readings
     .map((reading) => `${includeLabels ? `${reading.label} ` : ""}${reading.systolicValue}/${reading.diastolicValue}`)
-    .join(" · ");
+    .join(" ? ");
 }
 
 function validateBloodPressure() {
@@ -874,13 +999,13 @@ function validateBloodPressure() {
     if (hasSystolic && hasDiastolic) hasCompleteReading = true;
     if (hasSystolic !== hasDiastolic) {
       const missingInput = hasSystolic ? diastolicInput : systolicInput;
-      missingInput.setCustomValidity(`请同时填写${label}间收缩压和舒张压`);
+      missingInput.setCustomValidity(`?????${label}????????`);
       valid = false;
     }
   });
 
   if (!hasCompleteReading && valid) {
-    document.getElementById("morningSystolic").setCustomValidity("请至少填写一个时段的完整血压");
+    document.getElementById("morningSystolic").setCustomValidity("??????????????");
     valid = false;
   }
   if (!valid) document.getElementById("dailyForm").reportValidity();
@@ -891,7 +1016,7 @@ function validateWeight() {
   const inputs = weightPeriods.map(({ field }) => document.getElementById(field));
   inputs.forEach((input) => input.setCustomValidity(""));
   if (inputs.some((input) => input.value !== "")) return true;
-  inputs[0].setCustomValidity("请至少填写一次体重");
+  inputs[0].setCustomValidity("?????????");
   document.getElementById("dailyForm").reportValidity();
   return false;
 }
@@ -900,7 +1025,7 @@ function validateUrineEntries() {
   const inputs = urineFields.map((field) => document.getElementById(field));
   inputs.forEach((input) => input.setCustomValidity(""));
   if (inputs.some((input) => input.value !== "")) return true;
-  inputs[0].setCustomValidity("请至少填写一次尿量");
+  inputs[0].setCustomValidity("?????????");
   document.getElementById("dailyForm").reportValidity();
   return false;
 }
@@ -917,8 +1042,8 @@ function sumInputFields(fields) {
 function updateFluidTotals() {
   const intakeTotal = sumInputFields(intakeFields);
   const urineTotal = sumInputFields(urineFields);
-  document.getElementById("intakeTotalDisplay").value = `${intakeTotal} ml`;
-  document.getElementById("urineTotalDisplay").value = `${urineTotal} ml`;
+  document.getElementById("intakeTotalDisplay").value = `${formatNumber(intakeTotal, 2)} ml`;
+  document.getElementById("urineTotalDisplay").value = `${formatNumber(urineTotal, 2)} ml`;
   const hasUrineEntry = urineFields.some((field) => document.getElementById(field).value !== "");
   const urineRisk = hasUrineEntry && urineTotal < 500;
   urineFields.forEach((field) => {
@@ -943,8 +1068,8 @@ function updateWeightHint() {
   const threeDayChange = previous && Number.isFinite(currentWeight)
     ? currentWeight - Number(dailyWeight(previous))
     : null;
-  const dailyRisk = dailyRange !== null && dailyRange > 2;
-  const threeDayRisk = threeDayChange !== null && threeDayChange >= 2;
+  const dailyRisk = dailyRange !== null && dailyRange > WEIGHT_DAILY_RANGE_RISK_JIN;
+  const threeDayRisk = threeDayChange !== null && threeDayChange >= WEIGHT_THREE_DAY_GAIN_RISK_JIN;
 
   weightPeriods.forEach(({ field }) => {
     const input = document.getElementById(field);
@@ -953,19 +1078,19 @@ function updateWeightHint() {
   });
 
   const messages = [];
-  if (dailyRange !== null) messages.push(`单日波动 ${dailyRange.toFixed(1)} kg`);
+  if (dailyRange !== null) messages.push(`???? ${formatNumber(dailyRange, 1)} ?`);
   if (threeDayChange !== null) {
-    messages.push(`较 ${formatShortDate(previous.date)} ${threeDayChange >= 0 ? "增加" : "减少"} ${Math.abs(threeDayChange).toFixed(1)} kg`);
+    messages.push(`? ${formatShortDate(previous.date)} ${threeDayChange >= 0 ? "??" : "??"} ${formatNumber(Math.abs(threeDayChange), 1)} ?`);
   }
   hint.textContent = messages.length
-    ? messages.join("；")
-    : "至少填写一次；单日最高与最低相差超过 2 kg 时预警。";
+    ? messages.join("?")
+    : "??????????? 4 ??? 2 kg?????";
 }
 
 function renderDailyMedicationList() {
   const container = document.getElementById("dailyMedicationList");
   if (!state.medications.length) {
-    container.innerHTML = `<div class="empty-state">暂未添加药物。请先进入“药物管理”。</div>`;
+    container.innerHTML = `<div class="empty-state">??????????????????</div>`;
     return;
   }
 
@@ -974,11 +1099,11 @@ function renderDailyMedicationList() {
       <table class="medication-check-list">
         <thead>
           <tr>
-            <th>药物</th>
-            <th>早</th>
-            <th>中</th>
-            <th>晚</th>
-            <th>剩余</th>
+            <th>??</th>
+            <th>?</th>
+            <th>?</th>
+            <th>?</th>
+            <th>??</th>
           </tr>
         </thead>
         <tbody>
@@ -989,7 +1114,7 @@ function renderDailyMedicationList() {
                 <td><strong>${escapeHtml(medication.name)}</strong></td>
                 ${["morning", "noon", "night"].map((period) => {
                   const dose = medication[`${period}Dose`];
-                  if (!dose) return "<td>—</td>";
+                  if (!dose) return "<td>?</td>";
                   return `
                     <td>
                       <label class="dose-check">
@@ -999,7 +1124,7 @@ function renderDailyMedicationList() {
                     </td>
                   `;
                 }).join("")}
-                <td>${medication.remainingCount ?? "—"} ${escapeHtml(medication.remainingUnit || "")}</td>
+                <td>${medication.remainingCount ?? "?"} ${escapeHtml(medication.remainingUnit || "")}</td>
               </tr>
             `;
           }).join("")}
@@ -1017,7 +1142,7 @@ function renderDailyMedicationList() {
       saveState();
       renderMedicationTable();
       renderSummary();
-      showToast("用药状态已保存");
+      showToast("???????");
     });
   });
 }
@@ -1042,23 +1167,22 @@ function formRecord() {
   fieldIds.forEach((id) => {
     record[id === "recordDate" ? "date" : id] = document.getElementById(id).value;
   });
+  record.date ||= state.selectedDate || localDateString();
   numericRecordFields.forEach((key) => {
     record[key] = record[key] === "" ? "" : Number(record[key]);
   });
+  record.weightUnit = "jin";
   record.weight = dailyWeight(record);
   record.intake = sumRecordFields(record, intakeFields);
   record.urine = sumRecordFields(record, urineFields);
+  record.heartRate = dailyVital(record, heartRatePeriods);
+  record.spo2 = dailyVital(record, spo2Periods);
   record.updatedAt = new Date().toISOString();
   return record;
 }
 
 function saveDailyRecord(event) {
   event.preventDefault();
-  const form = event.currentTarget;
-  if (!validateWeight()) return;
-  if (!validateBloodPressure()) return;
-  if (!validateUrineEntries()) return;
-  if (!form.reportValidity()) return;
   const record = formRecord();
   const existingIndex = state.records.findIndex((item) => item.date === record.date);
   if (existingIndex >= 0) state.records[existingIndex] = record;
@@ -1067,21 +1191,21 @@ function saveDailyRecord(event) {
   state.weekEnd = record.date > localDateString() ? localDateString() : record.date;
   saveState();
   renderAll();
-  showToast(getAlerts(record).length ? "记录已保存，并发现需要关注的预警" : "每日记录已保存");
+  showToast(getAlerts(record).length ? "????????????????" : "???????");
 }
 
 function deleteDailyRecord() {
-  if (!window.confirm(`确定删除 ${formatDate(state.selectedDate)} 的记录吗？`)) return;
+  if (!window.confirm(`???? ${formatDate(state.selectedDate)} ?????`)) return;
   state.records = state.records.filter((record) => record.date !== state.selectedDate);
   saveState();
   renderAll();
-  showToast("记录已删除");
+  showToast("?????");
 }
 
 function renderMedicationTable() {
   const body = document.getElementById("medicationTableBody");
   if (!state.medications.length) {
-    body.innerHTML = `<tr><td colspan="7"><div class="empty-state">还没有药物记录。</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="7"><div class="empty-state">????????</div></td></tr>`;
     return;
   }
   const today = localDateString();
@@ -1093,15 +1217,15 @@ function renderMedicationTable() {
       return `
         <tr>
           <td><strong>${escapeHtml(medication.name)}</strong></td>
-          <td>${escapeHtml(medication.morningDose || "—")}</td>
-          <td>${escapeHtml(medication.noonDose || "—")}</td>
-          <td>${escapeHtml(medication.nightDose || "—")}</td>
+          <td>${escapeHtml(medication.morningDose || "?")}</td>
+          <td>${escapeHtml(medication.noonDose || "?")}</td>
+          <td>${escapeHtml(medication.nightDose || "?")}</td>
           <td class="${done === scheduled.length && scheduled.length ? "status-normal" : "status-warning"}">${done}/${scheduled.length}</td>
-          <td>${medication.remainingCount ?? "—"} ${escapeHtml(medication.remainingUnit || "")}</td>
+          <td>${medication.remainingCount ?? "?"} ${escapeHtml(medication.remainingUnit || "")}</td>
           <td>
             <div class="table-actions">
-              <button type="button" data-edit-medication="${medication.id}">编辑</button>
-              <button type="button" data-delete-medication="${medication.id}">删除</button>
+              <button type="button" data-edit-medication="${medication.id}">??</button>
+              <button type="button" data-delete-medication="${medication.id}">??</button>
             </div>
           </td>
         </tr>
@@ -1127,7 +1251,7 @@ function openMedicationForm(id = "") {
   document.getElementById("noonDose").value = medication?.noonDose || "";
   document.getElementById("nightDose").value = medication?.nightDose || "";
   document.getElementById("remainingCount").value = medication?.remainingCount ?? "";
-  document.getElementById("remainingUnit").value = medication?.remainingUnit || "片";
+  document.getElementById("remainingUnit").value = medication?.remainingUnit || "?";
   document.getElementById("medicationName").focus();
   form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -1143,7 +1267,7 @@ function saveMedication(event) {
     noonDose: document.getElementById("noonDose").value.trim(),
     nightDose: document.getElementById("nightDose").value.trim(),
     remainingCount: numberOrBlank(document.getElementById("remainingCount").value),
-    remainingUnit: document.getElementById("remainingUnit").value.trim() || "片",
+    remainingUnit: document.getElementById("remainingUnit").value.trim() || "?",
     taken: existing?.taken || {},
   };
   if (existing) Object.assign(existing, medication);
@@ -1153,25 +1277,25 @@ function saveMedication(event) {
   renderMedicationTable();
   renderDailyMedicationList();
   renderSummary();
-  showToast("药物信息已保存");
+  showToast("???????");
 }
 
 function deleteMedication(id) {
   const medication = state.medications.find((item) => item.id === id);
-  if (!window.confirm(`确定删除“${medication.name}”吗？`)) return;
+  if (!window.confirm(`?????${medication.name}???`)) return;
   state.medications = state.medications.filter((item) => item.id !== id);
   saveState();
   renderMedicationTable();
   renderDailyMedicationList();
   renderSummary();
-  showToast("药物已删除");
+  showToast("?????");
 }
 
 function renderLabTable() {
   const body = document.getElementById("labTableBody");
   const labs = [...state.labs].sort((a, b) => b.date.localeCompare(a.date));
   if (!labs.length) {
-    body.innerHTML = `<tr><td colspan="11"><div class="empty-state">还没有复查指标。</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="11"><div class="empty-state">????????</div></td></tr>`;
     return;
   }
   body.innerHTML = labs
@@ -1189,8 +1313,8 @@ function renderLabTable() {
         <td>${displayValue(lab.uacr)}</td>
         <td>
           <div class="table-actions">
-            <button type="button" data-edit-lab="${lab.id}">编辑</button>
-            <button type="button" data-delete-lab="${lab.id}">删除</button>
+            <button type="button" data-edit-lab="${lab.id}">??</button>
+            <button type="button" data-delete-lab="${lab.id}">??</button>
           </div>
         </td>
       </tr>
@@ -1237,16 +1361,16 @@ function saveLab(event) {
   document.getElementById("labForm").classList.add("hidden");
   renderLabTable();
   renderSummary();
-  showToast("复查指标已保存");
+  showToast("???????");
 }
 
 function deleteLab(id) {
-  if (!window.confirm("确定删除这次复查记录吗？")) return;
+  if (!window.confirm("????????????")) return;
   state.labs = state.labs.filter((item) => item.id !== id);
   saveState();
   renderLabTable();
   renderSummary();
-  showToast("复查记录已删除");
+  showToast("???????");
 }
 
 function periodRecords(days) {
@@ -1259,7 +1383,7 @@ function periodRecords(days) {
 
 function average(records, key, digits = 0) {
   const values = records.map((record) => record[key]).filter(populatedNumber).map(Number);
-  if (!values.length) return "—";
+  if (!values.length) return "?";
   return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(digits);
 }
 
@@ -1273,8 +1397,20 @@ function weightReadingCount(records) {
 
 function weightMinMax(records) {
   const values = weightValues(records);
-  if (!values.length) return "—";
-  return `${Math.min(...values).toFixed(1)}–${Math.max(...values).toFixed(1)}`;
+  if (!values.length) return "?";
+  return `${Math.min(...values).toFixed(1)}?${Math.max(...values).toFixed(1)}`;
+}
+
+function vitalValues(records, periods) {
+  return records.flatMap((record) => vitalReadings(record, periods).map((reading) => Number(reading.value)));
+}
+
+function vitalReadingCount(records, periods) {
+  return vitalValues(records, periods).length;
+}
+
+function averageVital(records, periods, digits = 0) {
+  return averageValues(vitalValues(records, periods), digits);
 }
 
 function bloodPressureValues(records, valueKey) {
@@ -1286,7 +1422,7 @@ function bloodPressureValues(records, valueKey) {
 }
 
 function averageValues(values, digits = 0) {
-  if (!values.length) return "—";
+  if (!values.length) return "?";
   return (values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(digits);
 }
 
@@ -1302,8 +1438,8 @@ function bloodPressureReadingCount(records) {
 
 function minMax(records, key, digits = 0) {
   const values = records.map((record) => record[key]).filter(populatedNumber).map(Number);
-  if (!values.length) return "—";
-  return `${Math.min(...values).toFixed(digits)}–${Math.max(...values).toFixed(digits)}`;
+  if (!values.length) return "?";
+  return `${Math.min(...values).toFixed(digits)}?${Math.max(...values).toFixed(digits)}`;
 }
 
 function medicationAdherence(records) {
@@ -1346,83 +1482,83 @@ function renderSummary() {
   content.innerHTML = `
     <header class="summary-sheet-header">
       <div>
-        <p class="section-kicker">家庭监测复诊摘要</p>
-        <h2>${escapeHtml(state.patient.name || "家人")} · 近 ${days} 天</h2>
-        <p>${escapeHtml(state.patient.condition || "心衰合并肾病")}</p>
+        <p class="section-kicker">????????</p>
+        <h2>${escapeHtml(state.patient.name || "??")} ? ? ${days} ?</h2>
+        <p>${escapeHtml(state.patient.condition || "??????")}</p>
       </div>
       <div class="summary-meta">
-        <div>${formatDate(start, true)} 至 ${formatDate(localDateString(), true)}</div>
-        <div>共记录 ${records.length}/${days} 天</div>
+        <div>${formatDate(start, true)} ? ${formatDate(localDateString(), true)}</div>
+        <div>??? ${records.length}/${days} ?</div>
       </div>
     </header>
 
     <div class="summary-metrics">
       <div class="summary-metric">
-        <span>体重范围</span>
-        <strong>${weightMinMax(records)} kg</strong>
+        <span>????</span>
+        <strong>${weightMinMax(records)} ?</strong>
       </div>
       <div class="summary-metric">
-        <span>期内体重变化</span>
-        <strong class="${weightChange >= 2 ? "status-risk" : ""}">${weightChange === null ? "—" : `${weightChange >= 0 ? "+" : ""}${weightChange.toFixed(1)} kg`}</strong>
+        <span>??????</span>
+        <strong class="${weightChange >= WEIGHT_THREE_DAY_GAIN_RISK_JIN ? "status-risk" : ""}">${weightChange === null ? "?" : `${weightChange >= 0 ? "+" : ""}${formatNumber(weightChange, 1)} ?`}</strong>
       </div>
       <div class="summary-metric">
-        <span>平均血压</span>
+        <span>????</span>
         <strong>${averageBloodPressure(records)}</strong>
       </div>
       <div class="summary-metric">
-        <span>平均血氧</span>
-        <strong>${average(records, "spo2", 1)}%</strong>
+        <span>????</span>
+        <strong>${averageVital(records, spo2Periods, 1)}%</strong>
       </div>
       <div class="summary-metric">
-        <span>平均心率</span>
-        <strong>${average(records, "heartRate")} 次/分</strong>
+        <span>????</span>
+        <strong>${averageVital(records, heartRatePeriods)} ?/?</strong>
       </div>
       <div class="summary-metric">
-        <span>平均每日尿量</span>
+        <span>??????</span>
         <strong>${average(records, "urine")} ml</strong>
       </div>
       <div class="summary-metric">
-        <span>最高呼吸评分</span>
-        <strong>${records.length ? Math.max(...records.map((record) => Number(record.breathing) || 0)) : "—"} 分</strong>
+        <span>??????</span>
+        <strong>${records.length ? Math.max(...records.map((record) => Number(record.breathing) || 0)) : "?"} ?</strong>
       </div>
       <div class="summary-metric">
-        <span>用药完成率</span>
-        <strong>${adherence.rate === null ? "—" : `${adherence.rate}%`}</strong>
+        <span>?????</span>
+        <strong>${adherence.rate === null ? "?" : `${adherence.rate}%`}</strong>
       </div>
     </div>
 
-    <h3>预警记录</h3>
+    <h3>????</h3>
     ${allAlerts.length
-      ? `<ul class="summary-alert-list">${allAlerts.map((alert) => `<li><span>${formatShortDate(alert.date)} · ${escapeHtml(alert.label)}</span><strong>需关注</strong></li>`).join("")}</ul>`
-      : `<p>本周期内未触发设定的红色预警条件。</p>`}
+      ? `<ul class="summary-alert-list">${allAlerts.map((alert) => `<li><span>${formatShortDate(alert.date)} ? ${escapeHtml(alert.label)}</span><strong>???</strong></li>`).join("")}</ul>`
+      : `<p>?????????????????</p>`}
 
-    <h3>趋势概述</h3>
+    <h3>????</h3>
     <p>
       ${records.length
-        ? `本周期记录 ${records.length} 天，体重共记录 ${weightReadingCount(records)} 次，范围 ${weightMinMax(records)} kg；血压共记录 ${bloodPressureReadingCount(records)} 次，平均血压 ${averageBloodPressure(records)} mmHg。平均饮水量 ${average(records, "intake")} ml/天，平均尿量 ${average(records, "urine")} ml/天。平均血氧 ${average(records, "spo2", 1)}%，平均心率 ${average(records, "heartRate")} 次/分。`
-        : "本周期暂无每日监测数据。"}
-      ${adherence.rate === null ? "暂无可计算的用药计划。" : `计划服药 ${adherence.scheduled} 次，已确认 ${adherence.taken} 次，完成率 ${adherence.rate}%。`}
+        ? `????? ${records.length} ??????? ${weightReadingCount(records)} ???? ${weightMinMax(records)} ??????? ${bloodPressureReadingCount(records)} ?????? ${averageBloodPressure(records)} mmHg?????? ${vitalReadingCount(records, heartRatePeriods)} ?????? ${averageVital(records, heartRatePeriods)} ?/??????? ${vitalReadingCount(records, spo2Periods)} ?????? ${averageVital(records, spo2Periods, 1)}%?????? ${average(records, "intake")} ml/?????? ${average(records, "urine")} ml/??`
+        : "????????????"}
+      ${adherence.rate === null ? "???????????" : `???? ${adherence.scheduled} ????? ${adherence.taken} ????? ${adherence.rate}%?`}
     </p>
 
-    <h3>最近一次复查</h3>
+    <h3>??????</h3>
     ${latestLab ? `
       <p>${formatDate(latestLab.date, true)}</p>
       <div class="summary-lab-grid">
         ${summaryLabItem("NT-proBNP", latestLab.ntProbnp, "pg/ml")}
         ${summaryLabItem("LVEF", latestLab.lvef, "%")}
-        ${summaryLabItem("肌酐", latestLab.creatinine, "μmol/L")}
+        ${summaryLabItem("??", latestLab.creatinine, "?mol/L")}
         ${summaryLabItem("eGFR", latestLab.egfr, "ml/min")}
-        ${summaryLabItem("血钾", latestLab.potassium, "mmol/L")}
-        ${summaryLabItem("血钠", latestLab.sodium, "mmol/L")}
-        ${summaryLabItem("白蛋白", latestLab.albumin, "g/L")}
-        ${summaryLabItem("24小时尿蛋白", latestLab.urineProtein24h, "g/24h")}
+        ${summaryLabItem("??", latestLab.potassium, "mmol/L")}
+        ${summaryLabItem("??", latestLab.sodium, "mmol/L")}
+        ${summaryLabItem("???", latestLab.albumin, "g/L")}
+        ${summaryLabItem("24?????", latestLab.urineProtein24h, "g/24h")}
         ${summaryLabItem("UACR", latestLab.uacr, "mg/g")}
       </div>
-    ` : `<p>暂无复查指标记录。</p>`}
+    ` : `<p>?????????</p>`}
 
-    <h3>备注与就诊沟通</h3>
-    <p>${records.filter((record) => record.notes).map((record) => `${formatShortDate(record.date)}：${escapeHtml(record.notes)}`).join("<br />") || "本周期暂无备注。"}</p>
-    <p><strong>提示：</strong>本摘要由家庭记录自动生成，仅用于复诊沟通，不作为诊断或自行调整药物的依据。</p>
+    <h3>???????</h3>
+    <p>${records.filter((record) => record.notes).map((record) => `${formatShortDate(record.date)}?${escapeHtml(record.notes)}`).join("<br />") || "????????"}</p>
+    <p><strong>???</strong>?????????????????????????????????????</p>
   `;
 }
 
@@ -1437,20 +1573,22 @@ function summaryPlainText() {
   const adherence = medicationAdherence(records);
   const latestLab = [...state.labs].sort((a, b) => b.date.localeCompare(a.date))[0];
   return [
-    `${state.patient.name || "家人"} · 近 ${days} 天家庭监测摘要`,
-    `记录天数：${records.length}/${days}`,
-    `体重记录：${weightReadingCount(records)} 次`,
-    `体重范围：${weightMinMax(records)} kg`,
-    `血压记录：${bloodPressureReadingCount(records)} 次`,
-    `平均血压：${averageBloodPressure(records)} mmHg`,
-    `平均心率：${average(records, "heartRate")} 次/分`,
-    `平均血氧：${average(records, "spo2", 1)}%`,
-    `平均饮水量：${average(records, "intake")} ml/天`,
-    `平均尿量：${average(records, "urine")} ml/天`,
-    `用药完成率：${adherence.rate === null ? "—" : `${adherence.rate}%`}`,
-    `预警：${alerts.length ? alerts.join("；") : "无"}`,
-    latestLab ? `最近复查：${latestLab.date}，NT-proBNP ${displayValue(latestLab.ntProbnp)}，LVEF ${displayValue(latestLab.lvef)}%，肌酐 ${displayValue(latestLab.creatinine)}，eGFR ${displayValue(latestLab.egfr)}，血钾 ${displayValue(latestLab.potassium)}，血钠 ${displayValue(latestLab.sodium)}，白蛋白 ${displayValue(latestLab.albumin)}，24小时尿蛋白 ${displayValue(latestLab.urineProtein24h)}，UACR ${displayValue(latestLab.uacr)}` : "最近复查：暂无",
-    "提示：摘要由家庭记录自动生成，仅用于复诊沟通。",
+    `${state.patient.name || "??"} ? ? ${days} ???????`,
+    `?????${records.length}/${days}`,
+    `?????${weightReadingCount(records)} ?`,
+    `?????${weightMinMax(records)} ?`,
+    `?????${bloodPressureReadingCount(records)} ?`,
+    `?????${averageBloodPressure(records)} mmHg`,
+    `?????${vitalReadingCount(records, heartRatePeriods)} ?`,
+    `?????${averageVital(records, heartRatePeriods)} ?/?`,
+    `?????${vitalReadingCount(records, spo2Periods)} ?`,
+    `?????${averageVital(records, spo2Periods, 1)}%`,
+    `??????${average(records, "intake")} ml/?`,
+    `?????${average(records, "urine")} ml/?`,
+    `??????${adherence.rate === null ? "?" : `${adherence.rate}%`}`,
+    `???${alerts.length ? alerts.join("?") : "?"}`,
+    latestLab ? `?????${latestLab.date}?NT-proBNP ${displayValue(latestLab.ntProbnp)}?LVEF ${displayValue(latestLab.lvef)}%??? ${displayValue(latestLab.creatinine)}?eGFR ${displayValue(latestLab.egfr)}??? ${displayValue(latestLab.potassium)}??? ${displayValue(latestLab.sodium)}???? ${displayValue(latestLab.albumin)}?24????? ${displayValue(latestLab.urineProtein24h)}?UACR ${displayValue(latestLab.uacr)}` : "???????",
+    "???????????????????????",
   ].join("\n");
 }
 
@@ -1466,7 +1604,7 @@ async function copySummary() {
     document.execCommand("copy");
     area.remove();
   }
-  showToast("复诊摘要已复制");
+  showToast("???????");
 }
 
 function switchView(view) {
@@ -1494,7 +1632,7 @@ function numberOrBlank(value) {
 }
 
 function displayValue(value) {
-  return value === "" || value === undefined || value === null ? "—" : value;
+  return value === "" || value === undefined || value === null ? "?" : value;
 }
 
 function escapeHtml(value) {
@@ -1550,12 +1688,17 @@ function bindEvents() {
     });
   });
   document.getElementById("recordDate").addEventListener("change", updateWeightHint);
-  ["spo2", "heartRate", "breathing", ...bloodPressurePeriods.map((period) => period.systolic)].forEach((id) => {
+  [
+    "breathing",
+    ...spo2Periods.map((period) => period.field),
+    ...heartRatePeriods.map((period) => period.field),
+    ...bloodPressurePeriods.map((period) => period.systolic),
+  ].forEach((id) => {
     document.getElementById(id).addEventListener("input", (event) => {
       const value = Number(event.target.value);
       const isRisk =
-        (id === "spo2" && value < 92) ||
-        (id === "heartRate" && value > 120) ||
+        (id.endsWith("Spo2") && value < 92) ||
+        (id.endsWith("HeartRate") && value > 120) ||
         (id.endsWith("Systolic") && value < 90) ||
         (id === "breathing" && value >= 3);
       event.target.classList.toggle("risk-field", event.target.value !== "" && isRisk);
@@ -1595,7 +1738,7 @@ function bindEvents() {
   document.getElementById("signUpButton").addEventListener("click", signUpForCloud);
   document.getElementById("syncNowButton").addEventListener("click", async () => {
     const success = cloudDirty ? await pushCloudState({ force: true }) : await pullCloudState();
-    if (success) showToast("家庭记录已同步");
+    if (success) showToast("???????");
   });
   document.getElementById("signOutButton").addEventListener("click", signOutFromCloud);
 
@@ -1610,23 +1753,23 @@ function bindEvents() {
   document.getElementById("patientForm").addEventListener("submit", (event) => {
     event.preventDefault();
     state.patient = {
-      name: document.getElementById("patientNameInput").value.trim() || "家人",
+      name: document.getElementById("patientNameInput").value.trim() || "??",
       age: numberOrBlank(document.getElementById("patientAgeInput").value),
-      condition: document.getElementById("patientConditionInput").value.trim() || "心衰合并肾病 · 每日居家监测",
+      condition: document.getElementById("patientConditionInput").value.trim() || "?????? ? ??????",
     };
     saveState();
     dialog.close();
     renderPatientHeader();
     renderSummary();
-    showToast("患者资料已保存");
+    showToast("???????");
   });
 
   document.getElementById("resetDemoButton").addEventListener("click", () => {
-    if (!window.confirm("恢复演示数据会覆盖当前浏览器中的全部记录，确定继续吗？")) return;
+    if (!window.confirm("???????????????????????????")) return;
     state = sampleState();
     saveState();
     renderAll();
-    showToast("已恢复演示数据");
+    showToast("???????");
   });
 
   window.addEventListener("online", () => {

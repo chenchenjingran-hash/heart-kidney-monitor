@@ -696,17 +696,17 @@ textarea:hover {
   font-size: 15px;
 }
 
-.six-entry-grid {
+.multi-entry-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
 
-.six-entry-grid label {
+.multi-entry-grid label {
   min-width: 0;
 }
 
-.six-entry-grid label > span {
+.multi-entry-grid label > span {
   display: block;
   margin-bottom: 5px;
   color: var(--muted);
@@ -714,7 +714,7 @@ textarea:hover {
   text-align: center;
 }
 
-.six-entry-grid input {
+.multi-entry-grid input {
   padding: 0 7px;
   text-align: center;
 }
@@ -1237,7 +1237,7 @@ dialog::backdrop {
     grid-template-columns: 1fr;
   }
 
-  .six-entry-grid {
+  .multi-entry-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
@@ -1316,8 +1316,8 @@ dialog::backdrop {
     grid-column: auto;
   }
 
-  .six-entry-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .multi-entry-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .measurement-heading {
