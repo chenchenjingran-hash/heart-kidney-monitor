@@ -8,7 +8,7 @@
       content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
     />
     <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css?v=20260617-autosave" />
+    <link rel="stylesheet" href="./styles.css?v=20260617-fieldtime" />
   </head>
   <body>
     <header class="app-header">
@@ -107,25 +107,43 @@
                     <div class="bp-reading">
                       <strong>早</strong>
                       <div class="split-input">
-                        <input id="morningSystolic" name="morningSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <div class="bp-input-stack">
+                          <span class="field-update-time" data-field-updated-for="morningSystolic">未填写</span>
+                          <input id="morningSystolic" name="morningSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        </div>
                         <span>/</span>
-                        <input id="morningDiastolic" name="morningDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        <div class="bp-input-stack">
+                          <span class="field-update-time" data-field-updated-for="morningDiastolic">未填写</span>
+                          <input id="morningDiastolic" name="morningDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        </div>
                       </div>
                     </div>
                     <div class="bp-reading">
                       <strong>中</strong>
                       <div class="split-input">
-                        <input id="noonSystolic" name="noonSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <div class="bp-input-stack">
+                          <span class="field-update-time" data-field-updated-for="noonSystolic">未填写</span>
+                          <input id="noonSystolic" name="noonSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        </div>
                         <span>/</span>
-                        <input id="noonDiastolic" name="noonDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        <div class="bp-input-stack">
+                          <span class="field-update-time" data-field-updated-for="noonDiastolic">未填写</span>
+                          <input id="noonDiastolic" name="noonDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        </div>
                       </div>
                     </div>
                     <div class="bp-reading">
                       <strong>晚</strong>
                       <div class="split-input">
-                        <input id="nightSystolic" name="nightSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        <div class="bp-input-stack">
+                          <span class="field-update-time" data-field-updated-for="nightSystolic">未填写</span>
+                          <input id="nightSystolic" name="nightSystolic" type="number" min="40" max="260" placeholder="收缩压" inputmode="numeric" />
+                        </div>
                         <span>/</span>
-                        <input id="nightDiastolic" name="nightDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        <div class="bp-input-stack">
+                          <span class="field-update-time" data-field-updated-for="nightDiastolic">未填写</span>
+                          <input id="nightDiastolic" name="nightDiastolic" type="number" min="30" max="180" placeholder="舒张压" inputmode="numeric" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -510,6 +528,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js?v=20260617-autosave" defer></script>
+    <script src="./app.js?v=20260617-fieldtime" defer></script>
   </body>
 </html>

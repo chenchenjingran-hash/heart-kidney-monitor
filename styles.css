@@ -663,8 +663,12 @@ textarea:hover {
 .split-input {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
-  align-items: center;
+  align-items: end;
   gap: 7px;
+}
+
+.bp-input-stack {
+  min-width: 0;
 }
 
 .measurement-field,
@@ -730,6 +734,25 @@ textarea:hover {
   color: var(--muted);
   font-size: 11px;
   text-align: center;
+}
+
+.field-update-time {
+  display: block;
+  min-height: 15px;
+  margin: 0 0 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.measurement-reading .field-update-time,
+.multi-entry-grid .field-update-time {
+  text-align: center;
+}
+
+.bp-input-stack .field-update-time {
+  text-align: left;
 }
 
 .multi-entry-grid input {

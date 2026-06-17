@@ -167,6 +167,7 @@ let cloudSyncing = false;
 let cloudDirty = localStorage.getItem(CLOUD_DIRTY_KEY) === "1";
 let lastSyncedPayload = "";
 let dailyAutoSaveTimer = null;
+let pendingDailyFieldIds = new Set();
 
 function localDateString(date = new Date()) {
   const year = date.getFullYear();
@@ -224,6 +225,21 @@ function formatUpdatedAt(value) {
 
 function updatedAtLabel(record) {
   return record?.updatedAt ? `修改时间：${formatUpdatedAt(record.updatedAt)}` : "尚未保存";
+}
+
+function fieldUpdatedAtLabel(record, fieldId) {
+  if (!record) return "未填写";
+  const value = record[fieldId];
+  const hasValue = value !== "" && value !== undefined && value !== null;
+  if (!hasValue) return "未填写";
+  const fieldUpdatedAt = record.fieldUpdatedAt && typeof record.fieldUpdatedAt === "object"
+    ? record.fieldUpdatedAt[fieldId]
+    : "";
+  const fallbackUpdatedAt = record.fieldUpdatedAt && Object.keys(record.fieldUpdatedAt).length
+    ? ""
+    : record.updatedAt;
+  const updatedAt = fieldUpdatedAt || fallbackUpdatedAt;
+  return updatedAt ? `修改：${formatUpdatedAt(updatedAt)}` : "未修改";
 }
 
 function formatShortDate(value) {
@@ -340,6 +356,9 @@ function singleValueEntries(fields, firstValue = "") {
 function normalizeRecord(record) {
   if (!record || typeof record !== "object") return record;
   const normalized = { ...record };
+  if (normalized.fieldUpdatedAt !== undefined && (typeof normalized.fieldUpdatedAt !== "object" || Array.isArray(normalized.fieldUpdatedAt))) {
+    normalized.fieldUpdatedAt = {};
+  }
   if (
     normalized.morningWeight === undefined &&
     normalized.noonWeight === undefined &&
@@ -966,7 +985,34 @@ function updateDailySaveText(record = getRecord(state.selectedDate), message = "
   if (note) note.textContent = text;
 }
 
+function ensureFieldUpdateMarkers() {
+  fieldIds.slice(1).forEach((id) => {
+    if (document.querySelector(`[data-field-updated-for="${id}"]`)) return;
+    const element = document.getElementById(id);
+    if (!element) return;
+    const marker = document.createElement("span");
+    marker.className = "field-update-time";
+    marker.dataset.fieldUpdatedFor = id;
+    marker.textContent = "未填写";
+    element.insertAdjacentElement("beforebegin", marker);
+  });
+}
+
+function updateFieldUpdateMarkers(record) {
+  document.querySelectorAll("[data-field-updated-for]").forEach((marker) => {
+    marker.textContent = fieldUpdatedAtLabel(record, marker.dataset.fieldUpdatedFor);
+  });
+}
+
+function markPendingFieldMarkers(message = "正在保存…") {
+  pendingDailyFieldIds.forEach((id) => {
+    const marker = document.querySelector(`[data-field-updated-for="${id}"]`);
+    if (marker) marker.textContent = message;
+  });
+}
+
 function populateDailyForm() {
+  ensureFieldUpdateMarkers();
   const record = getRecord(state.selectedDate);
   document.getElementById("recordHeading").textContent = `${formatDate(state.selectedDate)}记录`;
   document.getElementById("recordDate").value = state.selectedDate;
@@ -997,6 +1043,7 @@ function populateDailyForm() {
   });
   document.getElementById("deleteRecordButton").classList.toggle("hidden", !record);
   updateDailySaveText(record);
+  updateFieldUpdateMarkers(record);
   updateFluidTotals();
   updateWeightHint();
 }
@@ -1203,12 +1250,17 @@ function selectDate(date) {
   renderDailyView();
 }
 
-function formRecord() {
+function valuesMatch(a, b) {
+  return String(a ?? "") === String(b ?? "");
+}
+
+function formRecord(changedFieldIds = []) {
   const record = {};
   fieldIds.forEach((id) => {
     record[id === "recordDate" ? "date" : id] = document.getElementById(id).value;
   });
   record.date ||= state.selectedDate || localDateString();
+  const existing = getRecord(record.date);
   numericRecordFields.forEach((key) => {
     record[key] = record[key] === "" ? "" : Number(record[key]);
   });
@@ -1218,7 +1270,27 @@ function formRecord() {
   record.urine = sumRecordFields(record, urineFields);
   record.heartRate = dailyVital(record, heartRatePeriods);
   record.spo2 = dailyVital(record, spo2Periods);
-  record.updatedAt = new Date().toISOString();
+  const updatedAt = new Date().toISOString();
+  const previousFieldUpdatedAt = existing?.fieldUpdatedAt && typeof existing.fieldUpdatedAt === "object"
+    ? existing.fieldUpdatedAt
+    : {};
+  const fieldUpdatedAt = { ...previousFieldUpdatedAt };
+  const changedSet = new Set(changedFieldIds.filter((id) => fieldIds.includes(id) && id !== "recordDate"));
+  if (!changedSet.size) {
+    fieldIds.slice(1).forEach((id) => {
+      const value = record[id];
+      const previous = existing?.[id] ?? "";
+      const hasValue = value !== "" && value !== undefined && value !== null;
+      if ((hasValue && !existing) || !valuesMatch(value, previous)) changedSet.add(id);
+    });
+  }
+  changedSet.forEach((id) => {
+    const value = record[id];
+    if (value === "" || value === undefined || value === null) delete fieldUpdatedAt[id];
+    else fieldUpdatedAt[id] = updatedAt;
+  });
+  record.fieldUpdatedAt = fieldUpdatedAt;
+  record.updatedAt = updatedAt;
   return record;
 }
 
@@ -1239,23 +1311,32 @@ function renderAfterDailySave(record) {
   renderDailyMedicationList();
   renderSummary();
   updateDailySaveText(record);
+  updateFieldUpdateMarkers(record);
 }
 
 function autoSaveDailyRecord() {
-  const record = upsertDailyRecord(formRecord());
+  const changedFields = Array.from(pendingDailyFieldIds);
+  pendingDailyFieldIds.clear();
+  const record = upsertDailyRecord(formRecord(changedFields));
   renderAfterDailySave(record);
 }
 
-function scheduleDailyAutoSave() {
+function scheduleDailyAutoSave(fieldId = "") {
+  if (fieldId && fieldId !== "recordDate" && fieldIds.includes(fieldId)) {
+    pendingDailyFieldIds.add(fieldId);
+  }
   window.clearTimeout(dailyAutoSaveTimer);
   updateDailySaveText(getRecord(state.selectedDate), "正在自动保存…");
+  markPendingFieldMarkers();
   dailyAutoSaveTimer = window.setTimeout(autoSaveDailyRecord, DAILY_AUTO_SAVE_DELAY_MS);
 }
 
 function saveDailyRecord(event) {
   event.preventDefault();
   window.clearTimeout(dailyAutoSaveTimer);
-  const record = upsertDailyRecord(formRecord());
+  const changedFields = Array.from(pendingDailyFieldIds);
+  pendingDailyFieldIds.clear();
+  const record = upsertDailyRecord(formRecord(changedFields));
   renderAll();
   showToast(getAlerts(record).length ? "记录已保存，并发现需要关注的预警" : "每日记录已保存");
 }
@@ -1743,7 +1824,7 @@ function bindEvents() {
   dailyForm.addEventListener("submit", saveDailyRecord);
   dailyForm.addEventListener("input", (event) => {
     if (event.target.id === "recordDate") return;
-    scheduleDailyAutoSave();
+    scheduleDailyAutoSave(event.target.id);
   });
   dailyForm.addEventListener("change", (event) => {
     if (event.target.id === "recordDate") {
@@ -1751,7 +1832,7 @@ function bindEvents() {
       selectDate(date);
       return;
     }
-    scheduleDailyAutoSave();
+    scheduleDailyAutoSave(event.target.id);
   });
   document.getElementById("deleteRecordButton").addEventListener("click", deleteDailyRecord);
   weightPeriods.forEach(({ field }) => {
