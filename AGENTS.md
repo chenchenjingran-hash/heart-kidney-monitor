@@ -15,3 +15,4 @@ When implementing from a selected generated mock, treat that image as the source
 - Daily weight is recorded in jin and supports morning, noon, and night readings; legacy kilogram records migrate by converting kg to jin.
 - Daily water intake and urine output each support fifteen optional decimal entries and store an automatically calculated daily total.
 - Daily heart rate and SpO2 support morning, noon, and night readings; legacy single readings migrate to morning.
+- Daily records auto-save after field edits, show the last modified time above the form and timeline entry, and the daily view opens on the latest record date.

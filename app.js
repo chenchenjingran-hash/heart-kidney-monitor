@@ -9,6 +9,7 @@ const SUPABASE_URL = "https://hnwrytbwqufiktesjbth.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_LwdQ_fHZJCyxSWS4kQiCvg_mV8osjjW";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const CLOUD_PAYLOAD_VERSION = 4;
+const DAILY_AUTO_SAVE_DELAY_MS = 650;
 const JIN_PER_KG = 2;
 const WEIGHT_DAILY_RANGE_RISK_JIN = 4;
 const WEIGHT_THREE_DAY_GAIN_RISK_JIN = 4;
@@ -165,6 +166,7 @@ let cloudPushTimer = null;
 let cloudSyncing = false;
 let cloudDirty = localStorage.getItem(CLOUD_DIRTY_KEY) === "1";
 let lastSyncedPayload = "";
+let dailyAutoSaveTimer = null;
 
 function localDateString(date = new Date()) {
   const year = date.getFullYear();
@@ -193,6 +195,35 @@ function formatDate(value, includeYear = false) {
   const date = parseLocalDate(value);
   const monthDay = `${date.getMonth() + 1}月${date.getDate()}日`;
   return `${includeYear ? `${date.getFullYear()}年` : ""}${monthDay}（${WEEKDAYS[date.getDay()]}）`;
+}
+
+function latestRecordDate(records = []) {
+  const dates = records
+    .map((record) => record?.date)
+    .filter(Boolean)
+    .sort((a, b) => b.localeCompare(a));
+  return dates[0] || localDateString();
+}
+
+function weekEndForDate(date) {
+  const today = localDateString();
+  return date > today ? today : date;
+}
+
+function formatUpdatedAt(value) {
+  if (!value) return "尚未保存";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "尚未保存";
+  return date.toLocaleString("zh-CN", {
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function updatedAtLabel(record) {
+  return record?.updatedAt ? `修改时间：${formatUpdatedAt(record.updatedAt)}` : "尚未保存";
 }
 
 function formatShortDate(value) {
@@ -387,11 +418,11 @@ function loadState() {
       const loaded = {
         ...sampleState(),
         ...parsed,
-        selectedDate: parsed.selectedDate || localDateString(),
-        weekEnd: parsed.weekEnd || localDateString(),
         activeView: "daily",
       };
       loaded.records = normalizeRecords(parsed.records || loaded.records);
+      loaded.selectedDate = latestRecordDate(loaded.records);
+      loaded.weekEnd = weekEndForDate(loaded.selectedDate);
       return loaded;
     }
   } catch (error) {
@@ -442,6 +473,8 @@ function applyCloudPayload(payload) {
     labs: Array.isArray(payload.labs) ? payload.labs : state.labs,
     summaryDays: Number(payload.summaryDays) || state.summaryDays || 7,
   };
+  state.selectedDate = latestRecordDate(state.records);
+  state.weekEnd = weekEndForDate(state.selectedDate);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   renderAll();
 }
@@ -906,6 +939,7 @@ function renderTimeline() {
         <button class="timeline-row ${selected} ${risk}" type="button" data-date="${record.date}">
           <span class="timeline-date">${formatShortDate(record.date)}<br />${WEEKDAYS[parseLocalDate(record.date).getDay()]}</span>
           <span class="timeline-main">
+            <span class="timeline-updated">${updatedAtLabel(record)}</span>
             <span class="timeline-metric">体重<strong class="${weightRisk ? "status-risk" : ""}">${formatWeight(record)} 斤</strong></span>
             <span class="timeline-metric">血压<strong class="${bloodPressureRisk ? "status-risk" : ""}">${formatBloodPressure(record)}</strong></span>
             <span class="timeline-metric">心率<strong class="${heartRateRisk ? "status-risk" : ""}">${formatVital(record, heartRatePeriods)}</strong></span>
@@ -922,6 +956,14 @@ function renderTimeline() {
   list.querySelectorAll(".timeline-row").forEach((button) => {
     button.addEventListener("click", () => selectDate(button.dataset.date));
   });
+}
+
+function updateDailySaveText(record = getRecord(state.selectedDate), message = "") {
+  const status = document.getElementById("saveStatus");
+  const note = document.getElementById("recordUpdateNote");
+  const text = message || updatedAtLabel(record);
+  if (status) status.textContent = text;
+  if (note) note.textContent = text;
 }
 
 function populateDailyForm() {
@@ -954,9 +996,7 @@ function populateDailyForm() {
     if (target) target.classList.add("risk-field");
   });
   document.getElementById("deleteRecordButton").classList.toggle("hidden", !record);
-  document.getElementById("saveStatus").textContent = record
-    ? `已保存 · ${new Date(record.updatedAt).toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`
-    : "尚未保存";
+  updateDailySaveText(record);
   updateFluidTotals();
   updateWeightHint();
 }
@@ -1156,6 +1196,7 @@ function renderDailyView() {
 }
 
 function selectDate(date) {
+  window.clearTimeout(dailyAutoSaveTimer);
   state.selectedDate = date;
   if (date > state.weekEnd || dateDiff(state.weekEnd, date) > 6) state.weekEnd = date;
   saveState();
@@ -1181,15 +1222,40 @@ function formRecord() {
   return record;
 }
 
-function saveDailyRecord(event) {
-  event.preventDefault();
-  const record = formRecord();
+function upsertDailyRecord(record) {
   const existingIndex = state.records.findIndex((item) => item.date === record.date);
   if (existingIndex >= 0) state.records[existingIndex] = record;
   else state.records.push(record);
   state.selectedDate = record.date;
-  state.weekEnd = record.date > localDateString() ? localDateString() : record.date;
+  state.weekEnd = weekEndForDate(record.date);
   saveState();
+  return record;
+}
+
+function renderAfterDailySave(record) {
+  renderWeekStrip();
+  renderAlertBanner();
+  renderTimeline();
+  renderDailyMedicationList();
+  renderSummary();
+  updateDailySaveText(record);
+}
+
+function autoSaveDailyRecord() {
+  const record = upsertDailyRecord(formRecord());
+  renderAfterDailySave(record);
+}
+
+function scheduleDailyAutoSave() {
+  window.clearTimeout(dailyAutoSaveTimer);
+  updateDailySaveText(getRecord(state.selectedDate), "正在自动保存…");
+  dailyAutoSaveTimer = window.setTimeout(autoSaveDailyRecord, DAILY_AUTO_SAVE_DELAY_MS);
+}
+
+function saveDailyRecord(event) {
+  event.preventDefault();
+  window.clearTimeout(dailyAutoSaveTimer);
+  const record = upsertDailyRecord(formRecord());
   renderAll();
   showToast(getAlerts(record).length ? "记录已保存，并发现需要关注的预警" : "每日记录已保存");
 }
@@ -1673,7 +1739,20 @@ function bindEvents() {
     renderWeekStrip();
   });
 
-  document.getElementById("dailyForm").addEventListener("submit", saveDailyRecord);
+  const dailyForm = document.getElementById("dailyForm");
+  dailyForm.addEventListener("submit", saveDailyRecord);
+  dailyForm.addEventListener("input", (event) => {
+    if (event.target.id === "recordDate") return;
+    scheduleDailyAutoSave();
+  });
+  dailyForm.addEventListener("change", (event) => {
+    if (event.target.id === "recordDate") {
+      const date = event.target.value || localDateString();
+      selectDate(date);
+      return;
+    }
+    scheduleDailyAutoSave();
+  });
   document.getElementById("deleteRecordButton").addEventListener("click", deleteDailyRecord);
   weightPeriods.forEach(({ field }) => {
     document.getElementById(field).addEventListener("input", updateWeightHint);
@@ -1687,7 +1766,6 @@ function bindEvents() {
       updateFluidTotals();
     });
   });
-  document.getElementById("recordDate").addEventListener("change", updateWeightHint);
   [
     "breathing",
     ...spo2Periods.map((period) => period.field),

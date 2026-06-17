@@ -514,6 +514,13 @@ textarea:focus-visible {
   gap: 8px 16px;
 }
 
+.timeline-updated {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .timeline-metric {
   font-size: 13px;
 }
@@ -583,6 +590,17 @@ textarea:focus-visible {
 
 #dailyForm .form-grid {
   gap: 12px 14px;
+}
+
+.record-update-note {
+  margin: 0 0 12px;
+  padding: 9px 11px;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 #dailyForm .field small {
