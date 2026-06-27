@@ -8,7 +8,7 @@
       content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
     />
     <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css?v=20260628-timeline-toggle" />
+    <link rel="stylesheet" href="./styles.css?v=20260628-vitals-pair" />
   </head>
   <body>
     <header class="app-header">
@@ -152,7 +152,7 @@
                   </div>
                   <small class="bp-help">可分早、中、晚补录，每个时段需同时填写高压和低压。</small>
                 </div>
-                <div class="field measurement-field">
+                <div class="field measurement-field heart-rate-field">
                   <span>心率（次/分）</span>
                   <div class="three-entry-grid">
                     <div class="measurement-reading">
@@ -169,7 +169,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="field measurement-field">
+                <div class="field measurement-field spo2-field">
                   <span>血氧 SpO₂（%）</span>
                   <div class="three-entry-grid">
                     <div class="measurement-reading">
@@ -531,6 +531,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js?v=20260628-timeline-toggle" defer></script>
+    <script src="./app.js?v=20260628-vitals-pair" defer></script>
   </body>
 </html>

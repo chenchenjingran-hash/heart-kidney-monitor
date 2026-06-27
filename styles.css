@@ -1375,13 +1375,46 @@ dialog::backdrop {
   }
 
   #dailyForm .form-grid {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #dailyForm .field {
+    grid-column: 1 / -1;
   }
 
   #dailyForm .measurement-field,
   #dailyForm .blood-pressure-field,
   #dailyForm .fluid-field {
-    grid-column: auto;
+    grid-column: 1 / -1;
+  }
+
+  #dailyForm .heart-rate-field,
+  #dailyForm .spo2-field {
+    grid-column: span 1;
+  }
+
+  #dailyForm .heart-rate-field > span,
+  #dailyForm .spo2-field > span {
+    min-height: 32px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  #dailyForm .heart-rate-field .three-entry-grid,
+  #dailyForm .spo2-field .three-entry-grid {
+    gap: 6px;
+  }
+
+  #dailyForm .heart-rate-field .measurement-reading,
+  #dailyForm .spo2-field .measurement-reading {
+    padding: 8px 6px;
+  }
+
+  #dailyForm .heart-rate-field input,
+  #dailyForm .spo2-field input {
+    min-width: 0;
+    padding: 0 6px;
+    font-size: 13px;
   }
 
   .multi-entry-grid {
@@ -1396,7 +1429,7 @@ dialog::backdrop {
 
   .field-wide,
   #dailyForm .field-wide {
-    grid-column: auto;
+    grid-column: 1 / -1;
   }
 
   .timeline-list {
