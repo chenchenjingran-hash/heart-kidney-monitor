@@ -8,7 +8,7 @@
       content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
     />
     <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css?v=20260617-fieldtime" />
+    <link rel="stylesheet" href="./styles.css?v=20260628-timeline-toggle" />
   </head>
   <body>
     <header class="app-header">
@@ -61,7 +61,10 @@
                   <p class="section-kicker">照护时间线</p>
                   <h2 id="recentHeading">近期记录</h2>
                 </div>
-                <button class="text-button" id="jumpTodayButton" type="button">回到今天</button>
+                <div class="timeline-actions">
+                  <button class="secondary-button timeline-toggle-button" id="toggleTimelineButton" type="button" aria-controls="timelineList" aria-expanded="true">隐藏近期记录</button>
+                  <button class="text-button" id="jumpTodayButton" type="button">回到今天</button>
+                </div>
               </div>
               <div class="timeline-list" id="timelineList"></div>
             </section>
@@ -528,6 +531,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js?v=20260617-fieldtime" defer></script>
+    <script src="./app.js?v=20260628-timeline-toggle" defer></script>
   </body>
 </html>

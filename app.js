@@ -4,6 +4,7 @@ const STORAGE_KEY = "heartKidneyMonitor.v1";
 const CLOUD_DIRTY_KEY = "heartKidneyMonitor.cloudDirty.v1";
 const CLOUD_LOCAL_UPDATED_KEY = "heartKidneyMonitor.localUpdatedAt.v1";
 const CLOUD_REMOTE_UPDATED_KEY = "heartKidneyMonitor.remoteUpdatedAt.v1";
+const TIMELINE_VISIBILITY_KEY = "heartKidneyMonitor.timelineVisible.v1";
 const CLOUD_TABLE = "family_state";
 const SUPABASE_URL = "https://hnwrytbwqufiktesjbth.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_LwdQ_fHZJCyxSWS4kQiCvg_mV8osjjW";
@@ -168,6 +169,7 @@ let cloudDirty = localStorage.getItem(CLOUD_DIRTY_KEY) === "1";
 let lastSyncedPayload = "";
 let dailyAutoSaveTimer = null;
 let pendingDailyFieldIds = new Set();
+let timelineVisible = localStorage.getItem(TIMELINE_VISIBILITY_KEY) !== "0";
 
 function localDateString(date = new Date()) {
   const year = date.getFullYear();
@@ -977,6 +979,23 @@ function renderTimeline() {
   });
 }
 
+function renderTimelineVisibility() {
+  const panel = document.querySelector(".timeline-panel");
+  const list = document.getElementById("timelineList");
+  const button = document.getElementById("toggleTimelineButton");
+  if (!panel || !list || !button) return;
+  list.hidden = !timelineVisible;
+  panel.classList.toggle("timeline-collapsed", !timelineVisible);
+  button.textContent = timelineVisible ? "隐藏近期记录" : "显示近期记录";
+  button.setAttribute("aria-expanded", String(timelineVisible));
+}
+
+function toggleTimelineVisibility() {
+  timelineVisible = !timelineVisible;
+  localStorage.setItem(TIMELINE_VISIBILITY_KEY, timelineVisible ? "1" : "0");
+  renderTimelineVisibility();
+}
+
 function updateDailySaveText(record = getRecord(state.selectedDate), message = "") {
   const status = document.getElementById("saveStatus");
   const note = document.getElementById("recordUpdateNote");
@@ -1238,6 +1257,7 @@ function renderDailyView() {
   renderWeekStrip();
   renderAlertBanner();
   renderTimeline();
+  renderTimelineVisibility();
   populateDailyForm();
   renderDailyMedicationList();
 }
@@ -1806,6 +1826,7 @@ function bindEvents() {
     state.weekEnd = localDateString();
     selectDate(localDateString());
   });
+  document.getElementById("toggleTimelineButton").addEventListener("click", toggleTimelineVisibility);
   document.getElementById("openSummaryButton").addEventListener("click", () => switchView("summary"));
   document.getElementById("manageMedicationsButton").addEventListener("click", () => switchView("medications"));
   document.getElementById("previousWeekButton").addEventListener("click", () => {

@@ -425,6 +425,27 @@ textarea:focus-visible {
   min-height: 620px;
 }
 
+.timeline-panel.timeline-collapsed {
+  min-height: 0;
+}
+
+.timeline-panel.timeline-collapsed .section-heading {
+  border-bottom: 0;
+}
+
+.timeline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.timeline-toggle-button {
+  min-height: 36px;
+  padding: 0 13px;
+  font-size: 13px;
+}
+
 .section-heading,
 .subsection-heading {
   min-height: 72px;
@@ -1338,6 +1359,12 @@ dialog::backdrop {
   .app-main {
     padding-right: 10px;
     padding-left: 10px;
+  }
+
+  .timeline-actions {
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .form-grid,
