@@ -8,7 +8,7 @@
       content="心衰合并肾病患者家庭每日监测工具，支持家庭账号跨设备同步。"
     />
     <title>安心照护 · 每日监测</title>
-    <link rel="stylesheet" href="./styles.css?v=20260628-vitals-pair" />
+    <link rel="stylesheet" href="./styles.css?v=20260712-urine-first" />
   </head>
   <body>
     <header class="app-header">
@@ -86,6 +86,30 @@
                   <span>日期</span>
                   <input id="recordDate" name="date" type="date" />
                 </label>
+                <div class="field fluid-field urine-field">
+                  <div class="measurement-heading">
+                    <span>尿量（ml/天）</span>
+                    <strong>当日合计 <output id="urineTotalDisplay">0 ml</output></strong>
+                  </div>
+                  <div class="multi-entry-grid">
+                    <label><span>1</span><input id="urine1" name="urine1" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>2</span><input id="urine2" name="urine2" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>3</span><input id="urine3" name="urine3" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>4</span><input id="urine4" name="urine4" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>5</span><input id="urine5" name="urine5" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>6</span><input id="urine6" name="urine6" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>7</span><input id="urine7" name="urine7" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>8</span><input id="urine8" name="urine8" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>9</span><input id="urine9" name="urine9" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>10</span><input id="urine10" name="urine10" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>11</span><input id="urine11" name="urine11" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>12</span><input id="urine12" name="urine12" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>13</span><input id="urine13" name="urine13" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>14</span><input id="urine14" name="urine14" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                    <label><span>15</span><input id="urine15" name="urine15" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
+                  </div>
+                  <small class="monitoring-help">15 次记录会自动相加；当日总尿量低于 500 ml 时预警。</small>
+                </div>
                 <div class="field measurement-field weight-field">
                   <span>体重（斤）</span>
                   <div class="three-entry-grid">
@@ -208,30 +232,6 @@
                     <label><span>14</span><input id="intake14" name="intake14" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
                     <label><span>15</span><input id="intake15" name="intake15" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
                   </div>
-                </div>
-                <div class="field fluid-field">
-                  <div class="measurement-heading">
-                    <span>尿量（ml/天）</span>
-                    <strong>当日合计 <output id="urineTotalDisplay">0 ml</output></strong>
-                  </div>
-                  <div class="multi-entry-grid">
-                    <label><span>1</span><input id="urine1" name="urine1" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>2</span><input id="urine2" name="urine2" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>3</span><input id="urine3" name="urine3" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>4</span><input id="urine4" name="urine4" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>5</span><input id="urine5" name="urine5" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>6</span><input id="urine6" name="urine6" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>7</span><input id="urine7" name="urine7" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>8</span><input id="urine8" name="urine8" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>9</span><input id="urine9" name="urine9" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>10</span><input id="urine10" name="urine10" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>11</span><input id="urine11" name="urine11" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>12</span><input id="urine12" name="urine12" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>13</span><input id="urine13" name="urine13" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>14</span><input id="urine14" name="urine14" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                    <label><span>15</span><input id="urine15" name="urine15" type="number" min="0" step="any" placeholder="ml" inputmode="decimal" /></label>
-                  </div>
-                  <small class="monitoring-help">15 次记录会自动相加；当日总尿量低于 500 ml 时预警。</small>
                 </div>
                 <label class="field">
                   <span>水肿等级</span>
@@ -531,6 +531,6 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="./app.js?v=20260628-vitals-pair" defer></script>
+    <script src="./app.js?v=20260712-urine-first" defer></script>
   </body>
 </html>

@@ -19,3 +19,4 @@ When implementing from a selected generated mock, treat that image as the source
 - Each individual daily input stores and displays its own last modified time via `fieldUpdatedAt`, with legacy records falling back to the record-level timestamp until a field is edited.
 - The recent-records timeline can be shown or hidden; its visibility is remembered per browser device in localStorage and is not included in cloud-synced family data.
 - On phone-width layouts, heart rate and SpO2 are compact two-column groups, with heart rate on the left and SpO2 on the right; other daily fields remain full width.
+- Place the urine output total and entries at the top of the daily form, directly after the date, so caregivers see urine tracking before weight and other vitals.
