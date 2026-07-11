@@ -1827,6 +1827,7 @@ function bindEvents() {
   });
 
   document.getElementById("recordTodayButton").addEventListener("click", () => {
+    selectDate(localDateString());
     switchView("daily");
   });
   document.getElementById("jumpTodayButton").addEventListener("click", () => {
