@@ -1263,7 +1263,7 @@ function renderDailyView() {
 }
 
 function selectDate(date) {
-  window.clearTimeout(dailyAutoSaveTimer);
+  persistPendingDailyRecord(state.selectedDate);
   state.selectedDate = date;
   if (date > state.weekEnd || dateDiff(state.weekEnd, date) > 6) state.weekEnd = date;
   saveState();
@@ -1274,12 +1274,12 @@ function valuesMatch(a, b) {
   return String(a ?? "") === String(b ?? "");
 }
 
-function formRecord(changedFieldIds = []) {
+function formRecord(changedFieldIds = [], recordDateOverride = "") {
   const record = {};
   fieldIds.forEach((id) => {
     record[id === "recordDate" ? "date" : id] = document.getElementById(id).value;
   });
-  record.date ||= state.selectedDate || localDateString();
+  record.date = recordDateOverride || record.date || state.selectedDate || localDateString();
   const existing = getRecord(record.date);
   numericRecordFields.forEach((key) => {
     record[key] = record[key] === "" ? "" : Number(record[key]);
@@ -1334,10 +1334,18 @@ function renderAfterDailySave(record) {
   updateFieldUpdateMarkers(record);
 }
 
-function autoSaveDailyRecord() {
+function persistPendingDailyRecord(recordDate = state.selectedDate) {
+  if (!pendingDailyFieldIds.size) return null;
+  window.clearTimeout(dailyAutoSaveTimer);
+  dailyAutoSaveTimer = null;
   const changedFields = Array.from(pendingDailyFieldIds);
   pendingDailyFieldIds.clear();
-  const record = upsertDailyRecord(formRecord(changedFields));
+  return upsertDailyRecord(formRecord(changedFields, recordDate));
+}
+
+function autoSaveDailyRecord() {
+  const record = persistPendingDailyRecord();
+  if (!record) return;
   renderAfterDailySave(record);
 }
 
@@ -1354,6 +1362,7 @@ function scheduleDailyAutoSave(fieldId = "") {
 function saveDailyRecord(event) {
   event.preventDefault();
   window.clearTimeout(dailyAutoSaveTimer);
+  dailyAutoSaveTimer = null;
   const changedFields = Array.from(pendingDailyFieldIds);
   pendingDailyFieldIds.clear();
   const record = upsertDailyRecord(formRecord(changedFields));
@@ -1775,6 +1784,7 @@ async function copySummary() {
 }
 
 function switchView(view) {
+  persistPendingDailyRecord(state.selectedDate);
   state.activeView = view;
   saveState();
   renderNavigation();
@@ -1817,10 +1827,7 @@ function bindEvents() {
   });
 
   document.getElementById("recordTodayButton").addEventListener("click", () => {
-    state.weekEnd = localDateString();
-    selectDate(localDateString());
     switchView("daily");
-    document.getElementById("morningWeight").focus();
   });
   document.getElementById("jumpTodayButton").addEventListener("click", () => {
     state.weekEnd = localDateString();

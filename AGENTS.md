@@ -20,3 +20,4 @@ When implementing from a selected generated mock, treat that image as the source
 - The recent-records timeline can be shown or hidden; its visibility is remembered per browser device in localStorage and is not included in cloud-synced family data.
 - On phone-width layouts, heart rate and SpO2 are compact two-column groups, with heart rate on the left and SpO2 on the right; other daily fields remain full width.
 - Place the urine output total and entries at the top of the daily form, directly after the date, so caregivers see urine tracking before weight and other vitals.
+- The header's “记录今天” button only opens the daily-record view. It must not change the selected date or record values, and pending auto-save edits must be persisted before any daily-form rerender.
